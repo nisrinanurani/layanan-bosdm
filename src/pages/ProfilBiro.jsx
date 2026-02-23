@@ -15,7 +15,7 @@ const DEFAULT_DATA = {
     heroTitle: 'Profil Biro Organisasi dan Sumber Daya Manusia',
     heroSubtitle: 'Mengenal lebih dekat Visi, Misi, dan Fungsi Biro Organisasi dan Sumber Daya Manusia BRIN.',
     heroBg: null, // base64 background image
-    deskripsi: 'Biro Organisasi dan Sumber Daya Manusia (BOSDM) adalah unit kerja di bawah Sekretariat Utama BRIN yang memiliki tugas melaksanakan pengelolaan organisasi, tata laksana, dan sumber daya manusia.',
+    deskripsi: 'Biro Organisasi dan Sumber Daya Manusia mempunyai tugas melaksanakan koordinasi penataan organisasi dan tata laksana, pelaksanaan reformasi birokrasi, dan pengelolaan sumber daya manusia di lingkungan BRIN.\n\nmenyelenggarakan fungsi:\na. penataan organisasi dan tata laksana;\nb. pengoordinasian dan pelaksanaan reformasi birokrasi;\nc. perencanaan dan pengembangan kompetensi sumber daya manusia;\nd. pengembangan karier dan mutasi;\ne. pelaksanaan penilaian kinerja; dan\nf. pelaksanaan fungsi lain yang diberikan oleh Sekretaris Utama.',
     visi: 'Menjadi biro yang profesional, inovatif, dan berintegritas dalam pengelolaan SDM guna mendukung ekosistem riset dan inovasi nasional.',
     misi: '1. Menyelenggarakan manajemen SDM berbasis merit system\n2. Mengembangkan kompetensi dan karier pegawai secara berkelanjutan\n3. Membangun budaya kerja yang kolaboratif dan berorientasi hasil\n4. Menerapkan tata kelola organisasi yang transparan dan akuntabel',
     kepalaNama: 'Dr. Nama Kepala Biro, M.A.',
@@ -26,7 +26,6 @@ const DEFAULT_DATA = {
             id: 1,
             title: 'Fungsi Mutasi dan Pengelolaan Jabatan Fungsional',
             deskripsi: 'Melaksanakan urusan mutasi, kenaikan pangkat, pengangkatan, dan pemberhentian jabatan fungsional.',
-            unitId: 5142,
             tusi: [
                 'Penyusunan rencana dan pelaksanaan mutasi pegawai',
                 'Pengelolaan kenaikan pangkat dan jabatan fungsional',
@@ -37,7 +36,6 @@ const DEFAULT_DATA = {
             id: 2,
             title: 'Fungsi Penilaian Kompetensi',
             deskripsi: 'Melaksanakan asesmen, ujian dinas, dan pemetaan kompetensi pegawai.',
-            unitId: 5149,
             tusi: [
                 'Pelaksanaan asesmen kompetensi pegawai',
                 'Penyelenggaraan ujian dinas dan ujian penyesuaian',
@@ -48,7 +46,6 @@ const DEFAULT_DATA = {
             id: 3,
             title: 'Fungsi Pengelolaan Data dan Informasi SDM',
             deskripsi: 'Mengelola data pegawai, aplikasi internal, dan statistik kepegawaian.',
-            unitId: 5148,
             tusi: [
                 'Pengelolaan database dan informasi kepegawaian',
                 'Pengembangan sistem informasi SDM',
