@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, HelpCircle, Send, FileText,
-    X, CheckCircle, Clock, Calendar, ChevronRight, AlertCircle, Loader2, MessageCircle
+    X, CheckCircle, Clock, Calendar, ChevronRight, AlertCircle, Loader2, MessageCircle, Eye, Download
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ export default function TanyaKami({ userRole }) {
     const [showGuidance, setShowGuidance] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [previewFile, setPreviewFile] = useState(null); // { name, data, type }
 
     // State Riwayat — persisten via localStorage
     const [riwayat, setRiwayat] = useState(() => {
@@ -57,36 +58,56 @@ export default function TanyaKami({ userRole }) {
         setFormData({ ...formData, file });
     };
 
-    // === HANDLER: Submit Pertanyaan (Simulasi — simpan ke local state) ===
-    const handleSubmit = () => {
+    // === Helper: File ke Base64 ===
+    const fileToBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+    // === HANDLER: Submit Pertanyaan (Simulasi — simpan ke localStorage) ===
+    const handleSubmit = async () => {
         if (!formData.unitId) { alert("Pilih unit tujuan terlebih dahulu!"); return; }
         if (!formData.judul.trim()) { alert("Judul masalah harus diisi!"); return; }
         if (!formData.deskripsi.trim()) { alert("Deskripsi harus diisi!"); return; }
 
         setIsSubmitting(true);
 
-        setTimeout(() => {
-            const unitInfo = units.find(u => String(u.id_unit) === String(formData.unitId));
+        const unitInfo = units.find(u => String(u.id_unit) === String(formData.unitId));
 
-            const newPertanyaan = {
-                id: Date.now(),
-                judul: formData.judul.trim(),
-                deskripsi: formData.deskripsi.trim(),
-                unit_id: formData.unitId,
-                unit_nama: unitInfo ? unitInfo.fungsi : formData.unitId,
-                file_name: formData.file ? formData.file.name : null,
-                status: 'menunggu',
-                jawaban: null,
-                created_at: new Date().toISOString(),
-            };
+        // Konversi file ke base64 jika ada
+        let fileData = null;
+        let fileType = null;
+        if (formData.file) {
+            try {
+                fileData = await fileToBase64(formData.file);
+                fileType = formData.file.type;
+            } catch (err) {
+                console.error('Gagal baca file:', err);
+            }
+        }
 
-            const updated = [newPertanyaan, ...riwayat];
-            saveRiwayat(updated);
-            setFormData({ judul: '', deskripsi: '', unitId: '', file: null });
-            setSubmitSuccess(true);
-            setTimeout(() => setSubmitSuccess(false), 4000);
-            setIsSubmitting(false);
-        }, 800);
+        const newPertanyaan = {
+            id: Date.now(),
+            judul: formData.judul.trim(),
+            deskripsi: formData.deskripsi.trim(),
+            unit_id: formData.unitId,
+            unit_nama: unitInfo ? unitInfo.fungsi : formData.unitId,
+            file_name: formData.file ? formData.file.name : null,
+            file_data: fileData,
+            file_type: fileType,
+            status: 'menunggu',
+            jawaban: null,
+            created_at: new Date().toISOString(),
+        };
+
+        const updated = [newPertanyaan, ...riwayat];
+        saveRiwayat(updated);
+        setFormData({ judul: '', deskripsi: '', unitId: '', file: null });
+        setSubmitSuccess(true);
+        setTimeout(() => setSubmitSuccess(false), 4000);
+        setIsSubmitting(false);
     };
 
     // === HANDLER: Admin menjawab pertanyaan ===
@@ -269,7 +290,29 @@ export default function TanyaKami({ userRole }) {
                                                 {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </span>
                                             <span className="text-blue-500 font-medium">{item.unit_nama || `Unit ${item.unit_id}`}</span>
-                                            {item.file_name && (
+                                            {item.file_name && item.file_data && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (item.file_type && item.file_type.startsWith('image/')) {
+                                                            setPreviewFile(item);
+                                                        } else {
+                                                            // PDF atau file lain — buka di tab baru
+                                                            const link = document.createElement('a');
+                                                            link.href = item.file_data;
+                                                            link.target = '_blank';
+                                                            link.download = item.file_name;
+                                                            link.click();
+                                                        }
+                                                    }}
+                                                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                                                >
+                                                    {item.file_type && item.file_type.startsWith('image/')
+                                                        ? <Eye className="w-3 h-3" />
+                                                        : <Download className="w-3 h-3" />}
+                                                    {item.file_name}
+                                                </button>
+                                            )}
+                                            {item.file_name && !item.file_data && (
                                                 <span className="flex items-center gap-1 text-slate-500">
                                                     <FileText className="w-3 h-3" /> {item.file_name}
                                                 </span>
@@ -347,6 +390,27 @@ export default function TanyaKami({ userRole }) {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* MODAL PREVIEW GAMBAR */}
+            <AnimatePresence>
+                {previewFile && (
+                    <div className="fixed inset-0 z-[70] flex items-center justify-center p-6">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setPreviewFile(null)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full"
+                        >
+                            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                                <h3 className="font-bold text-sm truncate">{previewFile.file_name}</h3>
+                                <button onClick={() => setPreviewFile(null)} className="p-2 hover:bg-slate-200 rounded-full"><X className="w-5 h-5" /></button>
+                            </div>
+                            <div className="p-4 flex items-center justify-center bg-slate-100 min-h-[300px]">
+                                <img src={previewFile.file_data} alt={previewFile.file_name} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
                             </div>
                         </motion.div>
                     </div>
