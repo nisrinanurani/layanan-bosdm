@@ -15,7 +15,7 @@ const DEFAULT_DATA = {
     heroTitle: 'Profil Biro Organisasi dan Sumber Daya Manusia',
     heroSubtitle: 'Mengenal lebih dekat Visi, Misi, dan Fungsi Biro Organisasi dan Sumber Daya Manusia BRIN.',
     heroBg: null, // base64 background image
-    deskripsi: 'Biro Organisasi dan Sumber Daya Manusia mempunyai tugas melaksanakan koordinasi penataan organisasi dan tata laksana, pelaksanaan reformasi birokrasi, dan pengelolaan sumber daya manusia di lingkungan BRIN.\n\nmenyelenggarakan fungsi:\na. penataan organisasi dan tata laksana;\nb. pengoordinasian dan pelaksanaan reformasi birokrasi;\nc. perencanaan dan pengembangan kompetensi sumber daya manusia;\nd. pengembangan karier dan mutasi;\ne. pelaksanaan penilaian kinerja; dan\nf. pelaksanaan fungsi lain yang diberikan oleh Sekretaris Utama.',
+    deskripsi: 'Biro Organisasi dan Sumber Daya Manusia mempunyai tugas melaksanakan koordinasi\n\nmenyelenggarakan fungsi:\na. penataan organisasi dan tata laksana;\nb. pengoordinasian dan pelaksanaan reformasi birokrasi;\nc. perencanaan dan pengembangan kompetensi sumber daya manusia;\nd. pengembangan karier dan mutasi;\ne. pelaksanaan penilaian kinerja; dan\nf. pelaksanaan fungsi lain yang diberikan oleh Sekretaris Utama.',
     visi: 'Menjadi biro yang profesional, inovatif, dan berintegritas dalam pengelolaan SDM guna mendukung ekosistem riset dan inovasi nasional.',
     misi: '1. Menyelenggarakan manajemen SDM berbasis merit system\n2. Mengembangkan kompetensi dan karier pegawai secara berkelanjutan\n3. Membangun budaya kerja yang kolaboratif dan berorientasi hasil\n4. Menerapkan tata kelola organisasi yang transparan dan akuntabel',
     kepalaNama: 'Dr. Nama Kepala Biro, M.A.',
