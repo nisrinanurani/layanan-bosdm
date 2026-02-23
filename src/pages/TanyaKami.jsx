@@ -17,8 +17,19 @@ export default function TanyaKami({ userRole }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
-    // State Riwayat (local / simulasi)
-    const [riwayat, setRiwayat] = useState([]);
+    // State Riwayat — persisten via localStorage
+    const [riwayat, setRiwayat] = useState(() => {
+        try {
+            const saved = localStorage.getItem('data_pertanyaan');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+
+    // Simpan ke localStorage setiap kali riwayat berubah
+    const saveRiwayat = (data) => {
+        setRiwayat(data);
+        localStorage.setItem('data_pertanyaan', JSON.stringify(data));
+    };
 
     // Data Unit
     const [units] = useState([
@@ -69,7 +80,8 @@ export default function TanyaKami({ userRole }) {
                 created_at: new Date().toISOString(),
             };
 
-            setRiwayat(prev => [newPertanyaan, ...prev]);
+            const updated = [newPertanyaan, ...riwayat];
+            saveRiwayat(updated);
             setFormData({ judul: '', deskripsi: '', unitId: '', file: null });
             setSubmitSuccess(true);
             setTimeout(() => setSubmitSuccess(false), 4000);
@@ -81,11 +93,12 @@ export default function TanyaKami({ userRole }) {
     const handleJawab = (id) => {
         const jawaban = prompt("Masukkan jawaban untuk pertanyaan ini:");
         if (jawaban && jawaban.trim()) {
-            setRiwayat(prev => prev.map(item =>
+            const updated = riwayat.map(item =>
                 item.id === id
                     ? { ...item, status: 'dijawab', jawaban: jawaban.trim() }
                     : item
-            ));
+            );
+            saveRiwayat(updated);
         }
     };
 
