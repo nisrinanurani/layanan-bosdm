@@ -89,12 +89,16 @@ export default function ProfilBiro({ userRole }) {
     });
     const [fungsiList, setFungsiList] = useState([]);
 
-    // === FETCH DATA DARI SUPABASE ===
+    // === FETCH DATA DARI SUPABASE (atau langsung pakai local state jika tidak ada) ===
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+            if (!supabase) {
+                // Mode simulasi — tanpa Supabase, pakai local state saja
+                setLoading(false);
+                return;
+            }
             try {
-                // Fetch profil_biro (singleton row id=1)
                 const { data: profil } = await supabase
                     .from('profil_biro')
                     .select('*')
@@ -110,7 +114,6 @@ export default function ProfilBiro({ userRole }) {
                     });
                 }
 
-                // Fetch fungsi_biro
                 const { data: fungsiData } = await supabase
                     .from('fungsi_biro')
                     .select('*')
@@ -137,6 +140,8 @@ export default function ProfilBiro({ userRole }) {
     const updateField = async (field, value) => {
         setDataProfil(prev => ({ ...prev, [field]: value }));
 
+        if (!supabase) return; // Mode simulasi
+
         const { error } = await supabase
             .from('profil_biro')
             .update({ [field]: value, updated_at: new Date().toISOString() })
@@ -155,10 +160,10 @@ export default function ProfilBiro({ userRole }) {
 
     // === HANDLER: Update fungsi field (title/content) ===
     const updateFungsi = async (id, field, value) => {
-        // Update local state dulu
         setFungsiList(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f));
 
-        // Simpan ke Supabase hanya untuk field yang relevan
+        if (!supabase) return; // Mode simulasi
+
         if (['title', 'content'].includes(field)) {
             const { error } = await supabase
                 .from('fungsi_biro')
@@ -178,6 +183,13 @@ export default function ProfilBiro({ userRole }) {
             ? Math.max(...fungsiList.map(f => f.sort_order || 0))
             : 0;
 
+        if (!supabase) {
+            // Mode simulasi — tambah ke local state saja
+            const newId = Date.now();
+            setFungsiList(prev => [...prev, { id: newId, title: 'Fungsi Baru', content: '', sort_order: maxOrder + 1, isOpen: true, isEditingTitle: true }]);
+            return;
+        }
+
         const { data, error } = await supabase
             .from('fungsi_biro')
             .insert({ title: 'Fungsi Baru', content: '', sort_order: maxOrder + 1 })
@@ -196,6 +208,11 @@ export default function ProfilBiro({ userRole }) {
     // === HANDLER: Hapus fungsi ===
     const deleteFungsi = async (id) => {
         if (!confirm('Yakin ingin menghapus fungsi ini?')) return;
+
+        if (!supabase) {
+            setFungsiList(prev => prev.filter(f => f.id !== id));
+            return;
+        }
 
         const { error } = await supabase
             .from('fungsi_biro')
