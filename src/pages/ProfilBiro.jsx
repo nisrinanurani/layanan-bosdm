@@ -1,406 +1,580 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Edit3, Save, X, Plus, ArrowLeft, Loader2, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import {
+    ChevronDown, Edit3, Save, X, Plus, ArrowLeft, Trash2,
+    GripVertical, Camera, User, Image, MessageCircle, ArrowUp, ArrowDown
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
 
-// --- KOMPONEN BANTUAN 1: Editable Text Section ---
-const EditableSection = ({ title, value, onSave, isSuperadmin, placeholder, isTextArea = true }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value);
-    const [saving, setSaving] = useState(false);
+// ===========================
+// KONSTANTA & DEFAULT DATA
+// ===========================
+const LS_KEY = 'profil_biro_cms';
 
-    // Sync tempValue when value prop changes (after fetch)
-    useEffect(() => { setTempValue(value); }, [value]);
+const DEFAULT_DATA = {
+    heroTitle: 'Profil Biro Organisasi dan Sumber Daya Manusia',
+    heroSubtitle: 'Mengenal lebih dekat Visi, Misi, dan Fungsi Biro Organisasi dan Sumber Daya Manusia BRIN.',
+    heroBg: null, // base64 background image
+    deskripsi: 'Biro Organisasi dan Sumber Daya Manusia (BOSDM) adalah unit kerja di bawah Sekretariat Utama BRIN yang memiliki tugas melaksanakan pengelolaan organisasi, tata laksana, dan sumber daya manusia.',
+    visi: 'Menjadi biro yang profesional, inovatif, dan berintegritas dalam pengelolaan SDM guna mendukung ekosistem riset dan inovasi nasional.',
+    misi: '1. Menyelenggarakan manajemen SDM berbasis merit system\n2. Mengembangkan kompetensi dan karier pegawai secara berkelanjutan\n3. Membangun budaya kerja yang kolaboratif dan berorientasi hasil\n4. Menerapkan tata kelola organisasi yang transparan dan akuntabel',
+    kepalaNama: 'Dr. Nama Kepala Biro, M.A.',
+    kepalaJabatan: 'Kepala Biro Organisasi dan SDM',
+    kepalaFoto: null, // base64
+    fungsiList: [
+        {
+            id: 1,
+            title: 'Fungsi Mutasi dan Pengelolaan Jabatan Fungsional',
+            deskripsi: 'Melaksanakan urusan mutasi, kenaikan pangkat, pengangkatan, dan pemberhentian jabatan fungsional.',
+            unitId: 5142,
+            tusi: [
+                'Penyusunan rencana dan pelaksanaan mutasi pegawai',
+                'Pengelolaan kenaikan pangkat dan jabatan fungsional',
+                'Penyusunan SK pengangkatan dan pemberhentian'
+            ],
+        },
+        {
+            id: 2,
+            title: 'Fungsi Penilaian Kompetensi',
+            deskripsi: 'Melaksanakan asesmen, ujian dinas, dan pemetaan kompetensi pegawai.',
+            unitId: 5149,
+            tusi: [
+                'Pelaksanaan asesmen kompetensi pegawai',
+                'Penyelenggaraan ujian dinas dan ujian penyesuaian',
+                'Pemetaan kompetensi dan talent management'
+            ],
+        },
+        {
+            id: 3,
+            title: 'Fungsi Pengelolaan Data dan Informasi SDM',
+            deskripsi: 'Mengelola data pegawai, aplikasi internal, dan statistik kepegawaian.',
+            unitId: 5148,
+            tusi: [
+                'Pengelolaan database dan informasi kepegawaian',
+                'Pengembangan sistem informasi SDM',
+                'Penyusunan laporan statistik kepegawaian'
+            ],
+        }
+    ]
+};
 
-    const handleSave = async () => {
-        setSaving(true);
-        await onSave(tempValue);
-        setSaving(false);
-        setIsEditing(false);
-    };
+// ===========================
+// UTILITAS: localStorage
+// ===========================
+const loadData = () => {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? { ...DEFAULT_DATA, ...JSON.parse(raw) } : { ...DEFAULT_DATA };
+    } catch { return { ...DEFAULT_DATA }; }
+};
+const saveData = (data) => localStorage.setItem(LS_KEY, JSON.stringify(data));
 
-    if (isEditing && isSuperadmin) {
+// ===========================
+// KOMPONEN: InlineEdit
+// ===========================
+const InlineEdit = ({ value, onSave, canEdit, label, multiline = false, className = '' }) => {
+    const [editing, setEditing] = useState(false);
+    const [temp, setTemp] = useState(value);
+    useEffect(() => setTemp(value), [value]);
+
+    if (editing && canEdit) {
         return (
-            <div className="mb-8 bg-slate-50 p-6 rounded-2xl border border-blue-100">
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">{title}</h3>
-                {isTextArea ? (
+            <div className="relative">
+                <div className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">{label}</div>
+                {multiline ? (
                     <textarea
-                        className="w-full p-4 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all min-h-[120px] text-slate-700 leading-relaxed font-sans"
-                        value={tempValue}
-                        onChange={(e) => setTempValue(e.target.value)}
-                        placeholder={placeholder}
-                        autoFocus
+                        className="w-full p-3 rounded-xl border-2 border-blue-400 focus:border-blue-600 outline-none transition-all min-h-[120px] text-slate-700 leading-relaxed bg-blue-50/50"
+                        value={temp} onChange={e => setTemp(e.target.value)} autoFocus
                     />
                 ) : (
                     <input
                         type="text"
-                        className="w-full p-4 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-slate-700 font-sans font-bold text-lg"
-                        value={tempValue}
-                        onChange={(e) => setTempValue(e.target.value)}
-                        placeholder={placeholder}
-                        autoFocus
+                        className="w-full p-3 rounded-xl border-2 border-blue-400 focus:border-blue-600 outline-none transition-all text-slate-700 font-bold bg-blue-50/50"
+                        value={temp} onChange={e => setTemp(e.target.value)} autoFocus
                     />
                 )}
-                <div className="flex justify-end gap-2 mt-4">
-                    {value && (
-                        <button onClick={() => { setIsEditing(false); setTempValue(value); }} className="px-4 py-2 text-slate-500 hover:bg-slate-200 rounded-lg font-medium text-sm transition-colors">Batal</button>
-                    )}
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-colors disabled:bg-slate-400">
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {saving ? 'Menyimpan...' : 'Simpan'}
-                    </button>
+                <div className="flex justify-end gap-2 mt-2">
+                    <button onClick={() => { setEditing(false); setTemp(value); }} className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Batal</button>
+                    <button onClick={() => { onSave(temp); setEditing(false); }} className="px-4 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1"><Save className="w-3 h-3" /> Simpan</button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="mb-8 group relative">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">{title}</h3>
-            <div className="prose prose-slate max-w-none">
-                <p className="text-slate-800 text-lg leading-relaxed font-sans whitespace-pre-wrap">
-                    {value || <span className="text-slate-400 italic">Belum ada data.</span>}
-                </p>
-            </div>
-            {isSuperadmin && (
+        <div className={`group relative ${className}`}>
+            <div className="whitespace-pre-wrap">{value || <span className="text-slate-400 italic">Belum diisi</span>}</div>
+            {canEdit && (
                 <button
-                    onClick={() => setIsEditing(true)}
-                    className="mt-3 flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                    onClick={() => setEditing(true)}
+                    className="absolute -right-2 -top-2 p-1.5 bg-blue-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 hover:bg-blue-700 z-10"
+                    title={`Edit ${label}`}
                 >
-                    <Edit3 className="w-3.5 h-3.5" /> Edit {title}
+                    <Edit3 className="w-3 h-3" />
                 </button>
             )}
         </div>
     );
 };
 
-// --- KOMPONEN UTAMA HALAMAN ---
+// ===========================
+// KOMPONEN: ImageUploader
+// ===========================
+const ImageUploader = ({ currentSrc, onUpload, label, shape = 'rect' }) => {
+    const ref = useRef();
+    const handleFile = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { alert('Maksimal 2MB!'); return; }
+        const reader = new FileReader();
+        reader.onload = () => onUpload(reader.result);
+        reader.readAsDataURL(file);
+    };
+    return (
+        <div className="relative group cursor-pointer" onClick={() => ref.current.click()}>
+            <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+            {currentSrc ? (
+                <img src={currentSrc} alt={label} className={`object-cover ${shape === 'circle' ? 'w-28 h-28 rounded-full' : 'w-full h-48 rounded-2xl'}`} />
+            ) : (
+                <div className={`bg-slate-200 flex items-center justify-center ${shape === 'circle' ? 'w-28 h-28 rounded-full' : 'w-full h-48 rounded-2xl'}`}>
+                    {shape === 'circle' ? <User className="w-10 h-10 text-slate-400" /> : <Image className="w-10 h-10 text-slate-400" />}
+                </div>
+            )}
+            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ${shape === 'circle' ? 'rounded-full' : 'rounded-2xl'}`}>
+                <Camera className="w-6 h-6 text-white" />
+            </div>
+        </div>
+    );
+};
+
+// ===========================
+// KOMPONEN UTAMA
+// ===========================
 export default function ProfilBiro({ userRole }) {
     const navigate = useNavigate();
-    const isSuperadmin = ['superadmin', 'admin'].includes(userRole);
+    const isSuperadmin = userRole === 'superadmin';
 
-    // STATE
-    const [loading, setLoading] = useState(true);
-    const [dataProfil, setDataProfil] = useState({
-        deskripsi: "",
-        visi: "",
-        misi: "",
-        ketua: ""
-    });
-    const [fungsiList, setFungsiList] = useState([]);
+    const [data, setData] = useState(loadData);
 
-    // === FETCH DATA DARI SUPABASE (atau langsung pakai local state jika tidak ada) ===
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            if (!supabase) {
-                // Mode simulasi — tanpa Supabase, pakai local state saja
-                setLoading(false);
-                return;
-            }
-            try {
-                const { data: profil } = await supabase
-                    .from('profil_biro')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
+    // Simpan ke localStorage setiap kali data berubah
+    useEffect(() => { saveData(data); }, [data]);
 
-                if (profil) {
-                    setDataProfil({
-                        deskripsi: profil.deskripsi || '',
-                        visi: profil.visi || '',
-                        misi: profil.misi || '',
-                        ketua: profil.ketua || ''
-                    });
-                }
+    // Helper update
+    const update = (field, value) => setData(prev => ({ ...prev, [field]: value }));
+    const updateFungsiList = (newList) => setData(prev => ({ ...prev, fungsiList: newList }));
 
-                const { data: fungsiData } = await supabase
-                    .from('fungsi_biro')
-                    .select('*')
-                    .order('sort_order', { ascending: true });
+    // State UI
+    const [openCards, setOpenCards] = useState({});
+    const toggleCard = (id) => setOpenCards(prev => ({ ...prev, [id]: !prev[id] }));
 
-                if (fungsiData) {
-                    setFungsiList(fungsiData.map(f => ({
-                        ...f,
-                        isOpen: false,
-                        isEditingTitle: false
-                    })));
-                }
-            } catch (err) {
-                console.error("Gagal memuat data profil:", err);
-            } finally {
-                setLoading(false);
-            }
+    // ===========================
+    // CRUD FUNGSI
+    // ===========================
+    const addFungsi = () => {
+        const newFungsi = {
+            id: Date.now(),
+            title: 'Fungsi Baru',
+            deskripsi: '',
+            unitId: null,
+            tusi: ['Tugas baru'],
         };
-
-        fetchData();
-    }, []);
-
-    // === HANDLER: Update field di profil_biro ===
-    const updateField = async (field, value) => {
-        setDataProfil(prev => ({ ...prev, [field]: value }));
-
-        if (!supabase) return; // Mode simulasi
-
-        const { error } = await supabase
-            .from('profil_biro')
-            .update({ [field]: value, updated_at: new Date().toISOString() })
-            .eq('id', 1);
-
-        if (error) {
-            console.error(`Gagal simpan ${field}:`, error);
-            alert(`Gagal menyimpan ${field}!`);
-        }
+        updateFungsiList([...data.fungsiList, newFungsi]);
+        setOpenCards(prev => ({ ...prev, [newFungsi.id]: true }));
     };
 
-    // === HANDLER: Toggle accordion ===
-    const toggleFungsi = (id) => {
-        setFungsiList(prev => prev.map(f => f.id === id ? { ...f, isOpen: !f.isOpen } : f));
+    const deleteFungsi = (id) => {
+        if (!confirm('Yakin hapus fungsi ini?')) return;
+        updateFungsiList(data.fungsiList.filter(f => f.id !== id));
     };
 
-    // === HANDLER: Update fungsi field (title/content) ===
-    const updateFungsi = async (id, field, value) => {
-        setFungsiList(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f));
-
-        if (!supabase) return; // Mode simulasi
-
-        if (['title', 'content'].includes(field)) {
-            const { error } = await supabase
-                .from('fungsi_biro')
-                .update({ [field]: value })
-                .eq('id', id);
-
-            if (error) {
-                console.error(`Gagal update fungsi:`, error);
-                alert("Gagal menyimpan perubahan!");
-            }
-        }
+    const updateFungsiField = (id, field, value) => {
+        updateFungsiList(data.fungsiList.map(f => f.id === id ? { ...f, [field]: value } : f));
     };
 
-    // === HANDLER: Tambah fungsi baru ===
-    const addFungsi = async () => {
-        const maxOrder = fungsiList.length > 0
-            ? Math.max(...fungsiList.map(f => f.sort_order || 0))
-            : 0;
-
-        if (!supabase) {
-            // Mode simulasi — tambah ke local state saja
-            const newId = Date.now();
-            setFungsiList(prev => [...prev, { id: newId, title: 'Fungsi Baru', content: '', sort_order: maxOrder + 1, isOpen: true, isEditingTitle: true }]);
-            return;
-        }
-
-        const { data, error } = await supabase
-            .from('fungsi_biro')
-            .insert({ title: 'Fungsi Baru', content: '', sort_order: maxOrder + 1 })
-            .select()
-            .single();
-
-        if (error) {
-            console.error("Gagal tambah fungsi:", error);
-            alert("Gagal menambah fungsi baru!");
-            return;
-        }
-
-        setFungsiList(prev => [...prev, { ...data, isOpen: true, isEditingTitle: true }]);
+    // CRUD TUSI
+    const addTusi = (fungsiId) => {
+        updateFungsiList(data.fungsiList.map(f =>
+            f.id === fungsiId ? { ...f, tusi: [...f.tusi, 'Tugas baru'] } : f
+        ));
     };
 
-    // === HANDLER: Hapus fungsi ===
-    const deleteFungsi = async (id) => {
-        if (!confirm('Yakin ingin menghapus fungsi ini?')) return;
-
-        if (!supabase) {
-            setFungsiList(prev => prev.filter(f => f.id !== id));
-            return;
-        }
-
-        const { error } = await supabase
-            .from('fungsi_biro')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error("Gagal hapus fungsi:", error);
-            alert("Gagal menghapus fungsi!");
-            return;
-        }
-
-        setFungsiList(prev => prev.filter(f => f.id !== id));
+    const updateTusi = (fungsiId, idx, value) => {
+        updateFungsiList(data.fungsiList.map(f =>
+            f.id === fungsiId ? { ...f, tusi: f.tusi.map((t, i) => i === idx ? value : t) } : f
+        ));
     };
 
-    // === LOADING STATE ===
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
-                    <p className="text-slate-500 font-medium">Memuat data profil...</p>
+    const deleteTusi = (fungsiId, idx) => {
+        updateFungsiList(data.fungsiList.map(f =>
+            f.id === fungsiId ? { ...f, tusi: f.tusi.filter((_, i) => i !== idx) } : f
+        ));
+    };
+
+    // REORDER
+    const moveFungsi = (id, dir) => {
+        const list = [...data.fungsiList];
+        const idx = list.findIndex(f => f.id === id);
+        if ((dir === -1 && idx === 0) || (dir === 1 && idx === list.length - 1)) return;
+        [list[idx], list[idx + dir]] = [list[idx + dir], list[idx]];
+        updateFungsiList(list);
+    };
+
+    // ===========================
+    // RENDER
+    // ===========================
+    return (
+        <div className="min-h-screen bg-slate-50 font-sans">
+
+            {/* === NAVBAR === */}
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
+                <div className="max-w-5xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+                        <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover:scale-105 transition-transform">B</div>
+                        <span className="font-bold text-lg tracking-tight group-hover:text-blue-600 transition-colors">Portal BOSDM</span>
+                    </div>
+                    <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+                        <ArrowLeft className="w-4 h-4" /> Kembali
+                    </button>
                 </div>
+            </nav>
+
+            {/* === HERO SECTION === */}
+            <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
+                {data.heroBg && (
+                    <div className="absolute inset-0">
+                        <img src={data.heroBg} alt="bg" className="w-full h-full object-cover opacity-20" />
+                    </div>
+                )}
+                <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-28">
+                    <InlineEdit
+                        value={data.heroTitle}
+                        onSave={(v) => update('heroTitle', v)}
+                        canEdit={isSuperadmin}
+                        label="Judul Hero"
+                        className="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-4"
+                    />
+                    <InlineEdit
+                        value={data.heroSubtitle}
+                        onSave={(v) => update('heroSubtitle', v)}
+                        canEdit={isSuperadmin}
+                        label="Sub Judul Hero"
+                        className="text-blue-200 text-lg max-w-2xl"
+                    />
+                    {isSuperadmin && (
+                        <div className="mt-8">
+                            <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold cursor-pointer transition-colors border border-white/20">
+                                <Image className="w-4 h-4" /> Ganti Background
+                                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = () => update('heroBg', reader.result);
+                                    reader.readAsDataURL(file);
+                                }} />
+                            </label>
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            <main className="max-w-5xl mx-auto px-6 py-12">
+
+                {/* === SECTION: DESKRIPSI === */}
+                <section className="mb-16">
+                    <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Tentang BOSDM</h2>
+                    <InlineEdit
+                        value={data.deskripsi}
+                        onSave={(v) => update('deskripsi', v)}
+                        canEdit={isSuperadmin}
+                        label="Deskripsi BOSDM"
+                        multiline
+                        className="text-slate-700 text-lg leading-relaxed"
+                    />
+                </section>
+
+                {/* === SECTION: VISI & MISI === */}
+                <section className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                        <h2 className="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">Visi</h2>
+                        <InlineEdit
+                            value={data.visi}
+                            onSave={(v) => update('visi', v)}
+                            canEdit={isSuperadmin}
+                            label="Visi"
+                            multiline
+                            className="text-slate-700 leading-relaxed"
+                        />
+                    </div>
+                    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                        <h2 className="text-xs font-black text-purple-600 uppercase tracking-[0.2em] mb-4">Misi</h2>
+                        <InlineEdit
+                            value={data.misi}
+                            onSave={(v) => update('misi', v)}
+                            canEdit={isSuperadmin}
+                            label="Misi"
+                            multiline
+                            className="text-slate-700 leading-relaxed"
+                        />
+                    </div>
+                </section>
+
+                {/* === SECTION: KEPALA BIRO === */}
+                <section className="mb-16">
+                    <h2 className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-6">Kepala Biro</h2>
+                    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-8">
+                        <div className="flex-shrink-0">
+                            {isSuperadmin ? (
+                                <ImageUploader
+                                    currentSrc={data.kepalaFoto}
+                                    onUpload={(src) => update('kepalaFoto', src)}
+                                    label="Foto Kepala"
+                                    shape="circle"
+                                />
+                            ) : (
+                                data.kepalaFoto ? (
+                                    <img src={data.kepalaFoto} alt="Kepala Biro" className="w-28 h-28 rounded-full object-cover" />
+                                ) : (
+                                    <div className="w-28 h-28 rounded-full bg-slate-200 flex items-center justify-center">
+                                        <User className="w-10 h-10 text-slate-400" />
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        <div className="text-center sm:text-left flex-1">
+                            <InlineEdit
+                                value={data.kepalaNama}
+                                onSave={(v) => update('kepalaNama', v)}
+                                canEdit={isSuperadmin}
+                                label="Nama Kepala"
+                                className="text-xl font-extrabold text-slate-900 mb-1"
+                            />
+                            <InlineEdit
+                                value={data.kepalaJabatan}
+                                onSave={(v) => update('kepalaJabatan', v)}
+                                canEdit={isSuperadmin}
+                                label="Jabatan"
+                                className="text-slate-500 font-medium"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* === SECTION: FUNGSI-FUNGSI BIRO === */}
+                <section>
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-xs font-black text-red-600 uppercase tracking-[0.2em]">Fungsi & Tugas</h2>
+                        {isSuperadmin && (
+                            <button onClick={addFungsi} className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-200 active:scale-95">
+                                <Plus className="w-4 h-4" /> Tambah Fungsi Baru
+                            </button>
+                        )}
+                    </div>
+
+                    {data.fungsiList.length === 0 && (
+                        <div className="text-center py-20 text-slate-400">
+                            <p className="font-bold">Belum ada data fungsi.</p>
+                            {isSuperadmin && <p className="text-sm mt-1">Klik "Tambah Fungsi Baru" untuk mulai.</p>}
+                        </div>
+                    )}
+
+                    <Reorder.Group
+                        axis="y"
+                        values={data.fungsiList}
+                        onReorder={(newOrder) => updateFungsiList(newOrder)}
+                        className="space-y-4"
+                    >
+                        {data.fungsiList.map((fungsi, fIdx) => (
+                            <Reorder.Item
+                                key={fungsi.id}
+                                value={fungsi}
+                                dragListener={false}
+                                className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                            >
+                                {/* === HEADER KARTU === */}
+                                <div className="px-6 py-5 flex items-center gap-3">
+
+                                    {/* Grip Handle (Superadmin only) */}
+                                    {isSuperadmin && (
+                                        <div className="flex flex-col gap-0.5 mr-1">
+                                            <button
+                                                onClick={() => moveFungsi(fungsi.id, -1)}
+                                                disabled={fIdx === 0}
+                                                className="p-1 text-slate-300 hover:text-blue-600 disabled:opacity-20 transition-colors"
+                                                title="Pindah ke atas"
+                                            >
+                                                <ArrowUp className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button
+                                                onClick={() => moveFungsi(fungsi.id, 1)}
+                                                disabled={fIdx === data.fungsiList.length - 1}
+                                                className="p-1 text-slate-300 hover:text-blue-600 disabled:opacity-20 transition-colors"
+                                                title="Pindah ke bawah"
+                                            >
+                                                <ArrowDown className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Judul */}
+                                    <div className="flex-1 cursor-pointer" onClick={() => toggleCard(fungsi.id)}>
+                                        <InlineEdit
+                                            value={fungsi.title}
+                                            onSave={(v) => updateFungsiField(fungsi.id, 'title', v)}
+                                            canEdit={isSuperadmin}
+                                            label="Judul Fungsi"
+                                            className="font-extrabold text-slate-800 text-lg"
+                                        />
+                                        {fungsi.deskripsi && !openCards[fungsi.id] && (
+                                            <p className="text-sm text-slate-500 mt-1 line-clamp-1">{fungsi.deskripsi}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-2 ml-4">
+                                        {isSuperadmin && (
+                                            <button onClick={() => deleteFungsi(fungsi.id)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Hapus">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                        <button onClick={() => toggleCard(fungsi.id)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                                            <motion.div animate={{ rotate: openCards[fungsi.id] ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                                                <ChevronDown className="w-5 h-5" />
+                                            </motion.div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* === BODY KARTU (Expandable) === */}
+                                <AnimatePresence>
+                                    {openCards[fungsi.id] && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="px-6 py-6 border-t border-slate-100 space-y-6">
+
+                                                {/* Deskripsi Fungsi */}
+                                                <div>
+                                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Deskripsi</h4>
+                                                    <InlineEdit
+                                                        value={fungsi.deskripsi}
+                                                        onSave={(v) => updateFungsiField(fungsi.id, 'deskripsi', v)}
+                                                        canEdit={isSuperadmin}
+                                                        label="Deskripsi Fungsi"
+                                                        multiline
+                                                        className="text-slate-600 leading-relaxed"
+                                                    />
+                                                </div>
+
+                                                {/* Tugas & Fungsi (Tusi) */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tugas & Fungsi (Tusi)</h4>
+                                                        {isSuperadmin && (
+                                                            <button onClick={() => addTusi(fungsi.id)} className="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors">
+                                                                <Plus className="w-3 h-3" /> Tambah
+                                                            </button>
+                                                        )}
+                                                    </div>
+
+                                                    {fungsi.tusi && fungsi.tusi.length > 0 ? (
+                                                        <ul className="space-y-2">
+                                                            {fungsi.tusi.map((item, idx) => (
+                                                                <li key={idx} className="flex items-start gap-3 group/tusi">
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2.5 flex-shrink-0" />
+                                                                    <div className="flex-1">
+                                                                        {isSuperadmin ? (
+                                                                            <TusiItem
+                                                                                value={item}
+                                                                                onSave={(v) => updateTusi(fungsi.id, idx, v)}
+                                                                                onDelete={() => deleteTusi(fungsi.id, idx)}
+                                                                            />
+                                                                        ) : (
+                                                                            <span className="text-slate-700 text-sm leading-relaxed">{item}</span>
+                                                                        )}
+                                                                    </div>
+                                                                    {/* Smart Link: Konsultasikan */}
+                                                                    {fungsi.unitId && (
+                                                                        <button
+                                                                            onClick={() => navigate(`/tanya`)}
+                                                                            className="opacity-0 group-hover/tusi:opacity-100 flex-shrink-0 flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg transition-all"
+                                                                            title="Konsultasikan ke unit ini"
+                                                                        >
+                                                                            <MessageCircle className="w-3 h-3" /> Konsultasikan
+                                                                        </button>
+                                                                    )}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p className="text-sm text-slate-400 italic">Belum ada poin tusi.</p>
+                                                    )}
+                                                </div>
+
+                                                {/* Unit ID (Superadmin only) */}
+                                                {isSuperadmin && (
+                                                    <div>
+                                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unit ID (untuk Smart Link)</h4>
+                                                        <input
+                                                            type="number"
+                                                            value={fungsi.unitId || ''}
+                                                            onChange={(e) => updateFungsiField(fungsi.id, 'unitId', parseInt(e.target.value) || null)}
+                                                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm w-32 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none"
+                                                            placeholder="5142"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </Reorder.Item>
+                        ))}
+                    </Reorder.Group>
+                </section>
+            </main>
+
+            {/* FOOTER */}
+            <footer className="bg-slate-950 text-slate-600 text-center py-6 text-sm border-t border-slate-900 mt-20">
+                &copy; {new Date().getFullYear()} Biro Organisasi dan SDM - BRIN
+            </footer>
+        </div>
+    );
+}
+
+// ===========================
+// KOMPONEN: TusiItem (editable bullet point)
+// ===========================
+function TusiItem({ value, onSave, onDelete }) {
+    const [editing, setEditing] = useState(false);
+    const [temp, setTemp] = useState(value);
+    useEffect(() => setTemp(value), [value]);
+
+    if (editing) {
+        return (
+            <div className="flex items-center gap-2">
+                <input
+                    type="text"
+                    value={temp}
+                    onChange={e => setTemp(e.target.value)}
+                    className="flex-1 px-3 py-1.5 border-2 border-blue-400 rounded-lg text-sm outline-none focus:border-blue-600 bg-blue-50/50"
+                    autoFocus
+                    onKeyDown={(e) => { if (e.key === 'Enter') { onSave(temp); setEditing(false); } if (e.key === 'Escape') { setEditing(false); setTemp(value); } }}
+                />
+                <button onClick={() => { onSave(temp); setEditing(false); }} className="p-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Save className="w-3 h-3" /></button>
+                <button onClick={() => { setEditing(false); setTemp(value); }} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-3 h-3" /></button>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-white font-sans">
-
-            {/* === NAVBAR === */}
-            <nav className="border-b border-slate-100 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
-                <div className="max-w-4xl mx-auto flex items-center justify-between">
-                    <div
-                        className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => navigate('/')}
-                        title="Kembali ke Beranda"
-                    >
-                        <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover:scale-105 transition-transform">B</div>
-                        <span className="font-bold text-lg tracking-tight group-hover:text-blue-600 transition-colors">Portal BOSDM</span>
-                    </div>
-
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> Kembali ke Dashboard
-                    </button>
-                </div>
-            </nav>
-
-            {/* === KONTEN UTAMA === */}
-            <main className="max-w-3xl mx-auto px-6 py-12">
-
-                <div className="mb-12 border-b border-slate-100 pb-8">
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-                        Profil dan Mengenal Kami
-                    </h1>
-                    <p className="text-slate-500 text-lg">
-                        Mengenal lebih dekat Visi, Misi, dan Fungsi Biro Organisasi dan Sumber Daya Manusia.
-                    </p>
-                </div>
-
-                <EditableSection
-                    title="Biro Organisasi dan Sumber Daya Manusia"
-                    value={dataProfil.deskripsi}
-                    onSave={(val) => updateField('deskripsi', val)}
-                    isSuperadmin={isSuperadmin}
-                    placeholder="Masukkan deskripsi umum tentang Biro OSDM..."
-                />
-
-                <EditableSection
-                    title="Visi"
-                    value={dataProfil.visi}
-                    onSave={(val) => updateField('visi', val)}
-                    isSuperadmin={isSuperadmin}
-                    placeholder="Masukkan Visi..."
-                />
-
-                <EditableSection
-                    title="Misi"
-                    value={dataProfil.misi}
-                    onSave={(val) => updateField('misi', val)}
-                    isSuperadmin={isSuperadmin}
-                    placeholder="Masukkan Misi..."
-                />
-
-                <EditableSection
-                    title="Ketua Biro"
-                    value={dataProfil.ketua}
-                    onSave={(val) => updateField('ketua', val)}
-                    isSuperadmin={isSuperadmin}
-                    placeholder="Nama Ketua Biro beserta Gelar..."
-                    isTextArea={false}
-                />
-
-                {/* === SECTION DROPDOWN FUNGSI === */}
-                <div className="mt-16 pt-10 border-t border-slate-200">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Fungsi-Fungsi di Biro</h2>
-                        {isSuperadmin && (
-                            <button onClick={addFungsi} className="flex items-center gap-2 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-4 py-2 rounded-xl font-bold text-sm transition-all">
-                                <Plus className="w-4 h-4" /> Tambah Fungsi
-                            </button>
-                        )}
-                    </div>
-
-                    {fungsiList.length === 0 && (
-                        <div className="text-center py-16 text-slate-400">
-                            <p className="font-medium">Belum ada data fungsi.</p>
-                            {isSuperadmin && <p className="text-sm mt-1">Klik "Tambah Fungsi" untuk mulai.</p>}
-                        </div>
-                    )}
-
-                    <div className="space-y-4">
-                        {fungsiList.map((fungsi) => (
-                            <div key={fungsi.id} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-
-                                <div className="bg-slate-50 px-6 py-4 flex items-center justify-between cursor-pointer" onClick={() => !fungsi.isEditingTitle && toggleFungsi(fungsi.id)}>
-
-                                    <div className="flex-1">
-                                        {fungsi.isEditingTitle && isSuperadmin ? (
-                                            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                                <input
-                                                    type="text"
-                                                    value={fungsi.title}
-                                                    onChange={(e) => setFungsiList(prev => prev.map(f => f.id === fungsi.id ? { ...f, title: e.target.value } : f))}
-                                                    className="px-3 py-1.5 border border-blue-300 rounded-lg text-sm font-bold w-1/2 focus:ring-2 focus:ring-blue-200 outline-none"
-                                                    autoFocus
-                                                />
-                                                <button onClick={() => updateFungsi(fungsi.id, 'title', fungsi.title).then(() => updateFungsi(fungsi.id, 'isEditingTitle', false))} className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Save className="w-4 h-4" /></button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-3">
-                                                <h4 className="font-extrabold text-slate-800">{fungsi.title}</h4>
-                                                {isSuperadmin && (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setFungsiList(prev => prev.map(f => f.id === fungsi.id ? { ...f, isEditingTitle: true } : f)); }}
-                                                        className="text-slate-400 hover:text-blue-600 transition-colors"
-                                                    >
-                                                        <Edit3 className="w-3.5 h-3.5" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center gap-2 ml-4">
-                                        {isSuperadmin && (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); deleteFungsi(fungsi.id); }}
-                                                className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                                                title="Hapus fungsi"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        <div className="text-slate-400">
-                                            {fungsi.isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <AnimatePresence>
-                                    {fungsi.isOpen && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="px-6 py-6 border-t border-slate-100"
-                                        >
-                                            <EditableSection
-                                                title={`Penjelasan ${fungsi.title}`}
-                                                value={fungsi.content}
-                                                onSave={(val) => updateFungsi(fungsi.id, 'content', val)}
-                                                isSuperadmin={isSuperadmin}
-                                                placeholder={`Masukkan rincian tugas dan fungsi dari ${fungsi.title}...`}
-                                            />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-            </main>
+        <div className="flex items-center gap-2 group/edit">
+            <span className="text-slate-700 text-sm leading-relaxed flex-1">{value}</span>
+            <button onClick={() => setEditing(true)} className="opacity-0 group-hover/edit:opacity-100 p-1 text-slate-300 hover:text-blue-600 transition-all"><Edit3 className="w-3 h-3" /></button>
+            <button onClick={onDelete} className="opacity-0 group-hover/edit:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all"><Trash2 className="w-3 h-3" /></button>
         </div>
     );
 }
