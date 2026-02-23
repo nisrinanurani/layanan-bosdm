@@ -514,19 +514,7 @@ export default function ProfilBiro({ userRole }) {
                                                     )}
                                                 </div>
 
-                                                {/* Unit ID (Superadmin only) */}
-                                                {isSuperadmin && (
-                                                    <div>
-                                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unit ID (untuk Smart Link)</h4>
-                                                        <input
-                                                            type="number"
-                                                            value={fungsi.unitId || ''}
-                                                            onChange={(e) => updateFungsiField(fungsi.id, 'unitId', parseInt(e.target.value) || null)}
-                                                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm w-32 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none"
-                                                            placeholder="5142"
-                                                        />
-                                                    </div>
-                                                )}
+
                                             </div>
                                         </motion.div>
                                     )}
