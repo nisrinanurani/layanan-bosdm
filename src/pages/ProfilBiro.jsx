@@ -152,7 +152,11 @@ export default function ProfilBiro({ userRole }) {
     const isSuperadmin = userRole === 'superadmin';
 
     const [data, setData] = useState(loadData);
-
+    // --- TAMBAHKAN KODE INI DISINI ---
+    useEffect(() => {
+        localStorage.removeItem(LS_KEY);
+    }, []);
+    // ---------------------------------
     // Simpan ke localStorage setiap kali data berubah
     useEffect(() => { saveData(data); }, [data]);
 
