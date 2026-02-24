@@ -5,6 +5,7 @@ import {
     GripVertical, Camera, User, Image, MessageCircle, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import logoBrin from '../assets/logo-brin-decs.png';
 
 // ===========================
 // KONSTANTA & DEFAULT DATA
@@ -226,8 +227,15 @@ export default function ProfilBiro({ userRole }) {
             <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-                        <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm group-hover:scale-105 transition-transform">B</div>
-                        <span className="font-bold text-lg tracking-tight group-hover:text-blue-600 transition-colors">Portal BOSDM</span>
+                        {/* Ganti div kotak merah 'B' dengan tag img ini */}
+                        <img
+                            src={logoBrin}
+                            alt="Logo BRIN"
+                            className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+                        />
+                        <span className="font-bold text-lg tracking-tight group-hover:text-blue-600 transition-colors text-slate-900">
+                            Portal BOSDM
+                        </span>
                     </div>
                     <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
                         <ArrowLeft className="w-4 h-4" /> Kembali
