@@ -3,6 +3,10 @@ import { motion } from 'framer-motion';
 import { LogOut, User, Bell, Edit3, Plus, Trash2, MessageCircle, Users, X } from 'lucide-react'; // Tambahkan X di sini
 import { useNavigate } from 'react-router-dom';
 
+// --- TAMBAHKAN IMPORT INI ---
+import logoBrin from '../assets/logo-brin-decs.png';
+// ----------------------------
+
 const DASHBOARD_MENU = [
     {
         id: 'profil',
@@ -65,7 +69,7 @@ export default function Dashboard({ userRole, onLogout }) {
                     {/* Logo BRIN */}
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img
-                            src="/assets/logo-brin-decs.png"
+                            src={logoBrin}
                             alt="Logo BRIN"
                             className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
                             onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=BRIN" }}
