@@ -151,7 +151,7 @@ export default function ProfilBiro({ userRole }) {
     const navigate = useNavigate();
     const isSuperadmin = userRole === 'superadmin';
 
-    const [data, setData] = useState(loadData);
+    const [data, setData] = useState(DEFAULT_DATA);
     // --- TAMBAHKAN KODE INI DISINI ---
     useEffect(() => {
         localStorage.removeItem(LS_KEY);
