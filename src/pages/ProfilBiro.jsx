@@ -278,7 +278,7 @@ export default function ProfilBiro({ userRole }) {
 
                 {/* === SECTION: DESKRIPSI === */}
                 <section className="mb-16">
-                    <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Tentang BOSDM</h2>
+                    <h2 className="text-lg font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Tentang BOSDM</h2>
                     <InlineEdit
                         value={data.deskripsi}
                         onSave={(v) => update('deskripsi', v)}
@@ -292,7 +292,7 @@ export default function ProfilBiro({ userRole }) {
                 {/* === SECTION: VISI & MISI === */}
                 <section className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                        <h2 className="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">Visi</h2>
+                        <h2 className="text-lg font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">Visi</h2>
                         <InlineEdit
                             value={data.visi}
                             onSave={(v) => update('visi', v)}
@@ -303,7 +303,7 @@ export default function ProfilBiro({ userRole }) {
                         />
                     </div>
                     <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                        <h2 className="text-xs font-black text-purple-600 uppercase tracking-[0.2em] mb-4">Misi</h2>
+                        <h2 className="text-lg font-black text-purple-600 uppercase tracking-[0.2em] mb-4">Misi</h2>
                         <InlineEdit
                             value={data.misi}
                             onSave={(v) => update('misi', v)}
@@ -317,7 +317,7 @@ export default function ProfilBiro({ userRole }) {
 
                 {/* === SECTION: KEPALA BIRO === */}
                 <section className="mb-16">
-                    <h2 className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-6">Kepala Biro</h2>
+                    <h2 className="text-lg font-black text-amber-600 uppercase tracking-[0.2em] mb-6">Kepala Biro</h2>
                     <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-8">
                         <div className="flex-shrink-0">
                             {isSuperadmin ? (
@@ -359,7 +359,7 @@ export default function ProfilBiro({ userRole }) {
                 {/* === SECTION: FUNGSI-FUNGSI BIRO === */}
                 <section>
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-xs font-black text-red-600 uppercase tracking-[0.2em]">Fungsi & Tugas</h2>
+                        <h2 className="text-lg font-black text-red-600 uppercase tracking-[0.2em]">Fungsi & Tugas</h2>
                         {isSuperadmin && (
                             <button onClick={addFungsi} className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-200 active:scale-95">
                                 <Plus className="w-4 h-4" /> Tambah Fungsi Baru
