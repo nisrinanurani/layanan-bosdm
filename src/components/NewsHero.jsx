@@ -74,9 +74,6 @@ export default function NewsHero() {
                             alt="Logo BRIN"
                             className="h-10 w-auto object-contain group-hover/logo:scale-105 transition-transform"
                         />
-                        <span className="font-bold text-lg tracking-tight text-slate-900 group-hover/logo:text-blue-700 transition-colors">
-                            Portal BOSDM
-                        </span>
                     </div>
 
                     {/* Logo BerAKHLAK (Kanan) */}
