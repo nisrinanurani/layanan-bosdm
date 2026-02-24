@@ -233,9 +233,6 @@ export default function ProfilBiro({ userRole }) {
                             alt="Logo BRIN"
                             className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
                         />
-                        <span className="font-bold text-lg tracking-tight group-hover:text-blue-600 transition-colors text-slate-900">
-                            Portal BOSDM
-                        </span>
                     </div>
                     <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
                         <ArrowLeft className="w-4 h-4" /> Kembali
