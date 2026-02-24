@@ -286,7 +286,7 @@ export default function PublicStats() {
                         variants={itemVariants}
                         className="mt-3 text-2xl text-white/70 font-medium max-w-xl mx-auto"
                     >
-                        Informasi terkini mengenai sumber daya manusia di lingkungan BRIN RI.
+                        Informasi terkini mengenai sumber daya manusia di lingkungan Badan Riset dan Informasi Nasional.
                     </motion.p>
                 </motion.div>
 

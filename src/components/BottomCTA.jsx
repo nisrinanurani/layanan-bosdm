@@ -54,7 +54,7 @@ export default function BottomCTA({ onOpenLogin, onOpenRegister }) {
 
                     {/* Subjudul */}
                     <p className="text-lg text-blue-100 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-md">
-                        Pusat layanan administrasi digital dan informasi sumber daya manusia terintegrasi di lingkungan BRIN RI.
+                        Pusat layanan informasi terintegrasi.
                     </p>
                 </motion.div>
 
