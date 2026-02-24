@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, User, Bell, Edit3, Plus, Trash2, MessageCircle, Users } from 'lucide-react';
+import { LogOut, User, Bell, Edit3, Plus, Trash2, MessageCircle, Users, X } from 'lucide-react'; // Tambahkan X di sini
 import { useNavigate } from 'react-router-dom';
 
 const DASHBOARD_MENU = [
@@ -52,13 +52,8 @@ export default function Dashboard({ userRole, onLogout }) {
     const navigate = useNavigate();
     const currentRole = userRole || 'pegawai';
 
-    // Aturan Akses berdasarkan role dari database
-    const permissions = {
-        canManageUsers: currentRole === 'superadmin',
-        canEditCharts: currentRole === 'superadmin',
-        canManageContent: ['superadmin', 'admin'].includes(currentRole),
-        canAnswerQuestions: ['superadmin', 'admin'].includes(currentRole),
-    };
+    // Definisikan izin dengan aman
+    const canManageUsers = currentRole === 'superadmin';
 
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 relative pb-20">
@@ -67,7 +62,7 @@ export default function Dashboard({ userRole, onLogout }) {
             <nav className="border-b border-slate-100 px-6 py-4 sticky top-0 z-50 bg-white/80 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-                    {/* Logo BRIN - Klik untuk kembali ke Landing Page */}
+                    {/* Logo BRIN */}
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img
                             src="/assets/logo-brin-decs.png"
@@ -80,26 +75,25 @@ export default function Dashboard({ userRole, onLogout }) {
                     <div className="flex items-center gap-6">
                         <div className="h-6 w-px bg-slate-200"></div>
 
-                        {/* Menu Profil Pegawai dengan Dropdown Kelola User */}
+                        {/* Dropdown Profile */}
                         <div className="relative group cursor-pointer">
                             <div className="flex items-center gap-3 group-hover:opacity-80 transition-opacity">
                                 <div className="text-right hidden sm:block">
-                                    {/* Ganti "Portal BOSDM" dengan Nama Pegawai yang dinamis */}
-                                    <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Portal BOSDM</p>
+                                    <p className="text-sm font-bold text-slate-900">Portal BOSDM</p>
                                     <p className="text-[10px] text-slate-500 uppercase tracking-wider">{currentRole}</p>
                                 </div>
-                                <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200 group-hover:border-blue-400 transition-colors flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center">
                                     <User className="w-6 h-6 text-slate-400" />
                                 </div>
                             </div>
 
-                            {/* Dropdown Menu - Muncul saat Profile di-hover atau di-klik */}
+                            {/* Dropdown Content */}
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
                                 <div className="py-1">
-                                    {permissions.canManageUsers && (
+                                    {canManageUsers && (
                                         <button
                                             onClick={() => navigate('/kelola-user')}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 transition-colors"
                                         >
                                             <Users className="w-4 h-4" /> Kelola User
                                         </button>
@@ -108,7 +102,7 @@ export default function Dashboard({ userRole, onLogout }) {
                                         onClick={onLogout}
                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-slate-50"
                                     >
-                                        <X className="w-4 h-4" /> Keluar Aplikasi
+                                        <LogOut className="w-4 h-4" /> Keluar Aplikasi
                                     </button>
                                 </div>
                             </div>
@@ -137,7 +131,6 @@ export default function Dashboard({ userRole, onLogout }) {
                             }}
                             className="group relative cursor-pointer"
                         >
-                            {/* KOTAK GAMBAR */}
                             <div className={`relative h-64 w-full rounded-2xl overflow-hidden mb-5 border border-slate-900/10 shadow-sm group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-300 ${item.color}`}>
                                 <img
                                     src={item.image}
