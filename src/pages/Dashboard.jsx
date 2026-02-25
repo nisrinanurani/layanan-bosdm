@@ -131,6 +131,7 @@ export default function Dashboard({ userRole, onLogout }) {
                             transition={{ delay: index * 0.1, duration: 0.5 }}
                             onClick={() => {
                                 if (item.id === 'profil') navigate('/profil');
+                                if (item.id === 'berita') navigate('/berita-kami', { state: { userRole } });
                                 if (item.id === 'tanya') navigate('/tanya');
                                 if (item.id === 'link') navigate('/semua-link', { state: { userRole } });
                             }}

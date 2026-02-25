@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import ProfilBiro from './pages/ProfilBiro';
 import TanyaKami from './pages/TanyaKami';
 import SemuaLink from './pages/SemuaLink';
+import BeritaKami from './pages/BeritaKami';
 
 function LandingPage({ onOpenLogin }) {
   return (
@@ -89,6 +90,18 @@ function App() {
           element={
             isLoggedIn ? (
               <SemuaLink userRole={userRole} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* RUTE BERITA KAMI */}
+        <Route
+          path="/berita-kami"
+          element={
+            isLoggedIn ? (
+              <BeritaKami userRole={userRole} />
             ) : (
               <Navigate to="/" />
             )
