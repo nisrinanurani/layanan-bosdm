@@ -65,7 +65,7 @@ export default function NewsHero() {
         <section className="relative w-full h-[85vh] min-h-[600px] overflow-hidden bg-blue-50 group">
 
             {/* === NAVBAR (Z-INDEX 50 AGAR DI DEPAN) === */}
-            <nav className="absolute top-0 left-0 right-0 z-50 border-b border-white/20 px-6 py-4 bg-white/10 backdrop-blur-md">
+            <nav className="absolute top-0 left-0 right-0 z-50 border-b border-white/20 px-6 py-4 bg-white/40">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     {/* Logo BRIN (Kiri) */}
                     <div className="flex items-center gap-3 cursor-pointer group/logo" onClick={() => navigate('/')}>
