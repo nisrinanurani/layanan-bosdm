@@ -10,6 +10,7 @@ import NewsDetail from './pages/NewsDetail';
 import Dashboard from './pages/Dashboard';
 import ProfilBiro from './pages/ProfilBiro';
 import TanyaKami from './pages/TanyaKami';
+import SemuaLink from './pages/SemuaLink';
 
 function LandingPage({ onOpenLogin }) {
   return (
@@ -76,6 +77,18 @@ function App() {
           element={
             isLoggedIn ? (
               <TanyaKami userRole={userRole} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* RUTE SEMUA LINK */}
+        <Route
+          path="/semua-link"
+          element={
+            isLoggedIn ? (
+              <SemuaLink userRole={userRole} />
             ) : (
               <Navigate to="/" />
             )

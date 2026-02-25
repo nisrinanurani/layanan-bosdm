@@ -132,6 +132,7 @@ export default function Dashboard({ userRole, onLogout }) {
                             onClick={() => {
                                 if (item.id === 'profil') navigate('/profil');
                                 if (item.id === 'tanya') navigate('/tanya');
+                                if (item.id === 'link') navigate('/semua-link', { state: { userRole } });
                             }}
                             className="group relative cursor-pointer"
                         >

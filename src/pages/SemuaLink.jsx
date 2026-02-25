@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Link as LinkIcon, Plus, Edit3, Trash2, X,
-    ExternalLink, Save, PlusCircle, Globe
+    ExternalLink, Save, PlusCircle, Globe, AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
