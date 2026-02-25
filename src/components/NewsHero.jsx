@@ -75,7 +75,11 @@ export default function NewsHero() {
                             className="h-10 w-auto object-contain group-hover/logo:scale-105 transition-transform"
                         />
                     </div>
-
+                    <div className="flex-1 text-center hidden md:block">
+                        <span className="font-bold text-sm lg:text-base text-slate-800 tracking-tight uppercase">
+                            Dashboard Biro Organisasi dan Sumber Daya Manusia BRIN
+                        </span>
+                    </div>
                     {/* Logo BerAKHLAK (Kanan) */}
                     <div className="flex items-center">
                         <img
