@@ -287,19 +287,62 @@ export default function TanyaKami({ userRole }) {
             <AnimatePresence>
                 {selectedPertanyaan && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedPertanyaan(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-10 overflow-hidden">
-                            <button onClick={() => setSelectedPertanyaan(null)} className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200"><X className="w-5 h-5" /></button>
+                        {/* Backdrop dengan efek blur */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedPertanyaan(null)}
+                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        />
+
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-10 overflow-hidden"
+                        >
+                            {/* Tombol Close */}
+                            <button onClick={() => setSelectedPertanyaan(null)} className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+
+                            {/* --- ALERT MERAH UNTUK PEGAWAI JIKA DIALIHKAN --- */}
+                            {!isAdmin && selectedPertanyaan.dialihkan && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 shadow-sm"
+                                >
+                                    <AlertCircle className="w-5 h-5 shrink-0" />
+                                    <p className="text-xs font-bold leading-tight uppercase tracking-wide">
+                                        Pertanyaan Anda sedang dialihkan ke fungsi: {selectedPertanyaan.unit_nama}
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* Konten Utama Pertanyaan */}
                             <h2 className="text-3xl font-black text-slate-900 mb-4">{selectedPertanyaan.judul}</h2>
                             <p className="text-slate-600 leading-relaxed text-lg mb-8 italic">"{selectedPertanyaan.deskripsi}"</p>
+
                             <div className="flex flex-wrap items-center gap-6 text-sm font-bold text-slate-400 mb-10 border-b pb-8 border-slate-100">
-                                <span className="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg"><CalendarIcon className="w-4 h-4" /> {new Date(selectedPertanyaan.created_at).toLocaleDateString('id-ID')}</span>
-                                <span className="flex items-center gap-2 text-blue-600"><HelpCircle className="w-4 h-4" /> {selectedPertanyaan.unit_nama}</span>
+                                <span className="flex items-center gap-2 bg-slate-50 px-3 py-1 rounded-lg">
+                                    <CalendarIcon className="w-4 h-4" />
+                                    {new Date(selectedPertanyaan.created_at).toLocaleDateString('id-ID')}
+                                </span>
+                                <span className="flex items-center gap-2 text-blue-600">
+                                    <HelpCircle className="w-4 h-4" />
+                                    {selectedPertanyaan.unit_nama}
+                                </span>
                             </div>
+
+                            {/* Jawaban Resmi (Jika Sudah Ada) */}
                             {selectedPertanyaan.jawaban && (
                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white shadow-lg"><CheckCircle className="w-5 h-5" /></div>
+                                        <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-green-100">
+                                            <CheckCircle className="w-5 h-5" />
+                                        </div>
                                         <span className="font-black text-slate-900 uppercase tracking-widest text-xs">Jawaban Resmi Admin</span>
                                     </div>
                                     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
@@ -368,25 +411,59 @@ export default function TanyaKami({ userRole }) {
                 )}
             </AnimatePresence>
 
-            {/* POP-UP 3: ALIKHAN FUNGSI DENGAN HIGHLIGHT */}
+            {/* POP-UP 3: ALIKHAN FUNGSI (DENGAN SEKAT & FITUR UBAH) */}
             <AnimatePresence>
                 {redirectingId && (
                     <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setRedirectingId(null)} className="absolute inset-0 bg-red-900/20 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-8">
-                            <h3 className="text-xl font-black mb-2 text-red-600 uppercase tracking-tight">Alihkan Pertanyaan</h3>
-                            <div className="space-y-3 mb-8">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
+                            <h3 className="text-xl font-black mb-6 text-red-600 uppercase tracking-tight">Pengaturan Aliran Fungsi</h3>
+
+                            {/* 1. SECTION FUNGSI AKTIF */}
+                            {riwayat.find(q => q.id === redirectingId)?.dialihkan && (
+                                <div className="mb-8">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Fungsi Terpilih Saat Ini</label>
+                                    <div className="p-4 bg-blue-50 border-2 border-blue-500 rounded-2xl flex items-center justify-between shadow-sm ring-4 ring-blue-50">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-blue-500 uppercase">Dialihkan ke:</span>
+                                            <span className="text-sm font-bold text-blue-700">{riwayat.find(q => q.id === redirectingId)?.unit_nama}</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRedirect(units.find(u => u.fungsi === riwayat.find(q => q.id === redirectingId)?.unit_nama))}
+                                            className="px-3 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-lg hover:bg-blue-700 shadow-md active:scale-95 transition-all"
+                                        >
+                                            UBAH
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 2. SEKAT PEMISAH */}
+                            <div className="flex items-center gap-4 mb-6">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Alihkan Fungsi</span>
+                                <div className="h-[1px] w-full bg-slate-100"></div>
+                            </div>
+
+                            {/* 3. LIST FUNGSI LAIN */}
+                            <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
                                 {units.map(u => {
-                                    const isSelected = riwayat.find(q => q.id === redirectingId)?.unit_nama === u.fungsi;
+                                    const isCurrentActive = riwayat.find(q => q.id === redirectingId)?.unit_nama === u.fungsi;
+                                    if (isCurrentActive) return null; // Sembunyikan yang sudah aktif dari list bawah
+
                                     return (
-                                        <button key={u.id_unit} onClick={() => handleRedirect(u)} className={`w-full p-4 text-left rounded-2xl border transition-all group flex justify-between items-center ${isSelected ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-100 shadow-md' : 'border-slate-100 hover:border-blue-500 hover:bg-blue-50'}`}>
-                                            <div className="flex flex-col"><span className={`text-sm font-bold ${isSelected ? 'text-blue-700' : 'text-slate-700'}`}>{u.fungsi}</span>{isSelected && <span className="text-[10px] font-black text-blue-500 uppercase mt-1">Dialihkan ke</span>}</div>
-                                            {isSelected ? <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-1 rounded-lg">UBAH</span> : <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />}
+                                        <button
+                                            key={u.id_unit}
+                                            onClick={() => handleRedirect(u)}
+                                            className="w-full p-4 text-left rounded-2xl border border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all group flex justify-between items-center"
+                                        >
+                                            <span className="text-sm font-bold text-slate-700 group-hover:text-blue-700">{u.fungsi}</span>
+                                            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
                                         </button>
                                     );
                                 })}
                             </div>
-                            <button onClick={() => setRedirectingId(null)} className="w-full py-3 text-slate-400 font-bold text-sm hover:text-slate-600">Batalkan</button>
+
+                            <button onClick={() => setRedirectingId(null)} className="w-full mt-6 py-3 text-slate-400 font-bold text-sm hover:text-slate-600 transition-colors">Batalkan</button>
                         </motion.div>
                     </div>
                 )}
