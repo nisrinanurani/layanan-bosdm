@@ -138,7 +138,7 @@ export default function NewsHero() {
                             <span className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider uppercase bg-blue-100 text-blue-600 rounded-sm shadow-sm">
                                 {NEWS_DATA[currentIndex].category}
                             </span>
-                            <h1 className="text-4xl md:text-6xl font-serif font-bold leading-tight mb-4 text-slate-900">
+                            <h1 className="text-2xl md:text-4xl font-serif font-bold leading-tight mb-4 text-slate-900">
                                 {NEWS_DATA[currentIndex].title}
                             </h1>
                             <p className="text-lg text-slate-700 mb-8 max-w-xl line-clamp-2 font-medium">
