@@ -6,12 +6,15 @@ import NewsHero from './components/NewsHero';
 import PublicStats from './components/PublicStats';
 import BottomCTA from './components/BottomCTA';
 import LoginModal from './components/LoginModal';
+
+// Pages
 import NewsDetail from './pages/NewsDetail';
 import Dashboard from './pages/Dashboard';
 import ProfilBiro from './pages/ProfilBiro';
 import TanyaKami from './pages/TanyaKami';
 import SemuaLink from './pages/SemuaLink';
 import BeritaKami from './pages/BeritaKami';
+import EditorBerita from './pages/EditorBerita';
 
 function LandingPage({ onOpenLogin }) {
   return (
@@ -28,8 +31,6 @@ function LandingPage({ onOpenLogin }) {
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  // State Login Simulasi
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('pegawai');
 
@@ -46,69 +47,51 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* --- 1. RUTE UTAMA (LANDING / DASHBOARD) --- */}
         <Route
           path="/"
           element={
             !isLoggedIn ? (
-              <LandingPage
-                onOpenLogin={() => setIsLoginOpen(true)}
-              />
+              <LandingPage onOpenLogin={() => setIsLoginOpen(true)} />
             ) : (
               <Dashboard userRole={userRole} onLogout={handleLogout} />
             )
           }
         />
+
+        {/* --- 2. RUTE PUBLIK --- */}
         <Route path="/berita/:id" element={<NewsDetail />} />
 
-        {/* RUTE PROFIL BIRO */}
+        {/* --- 3. RUTE PRIVATE (HARUS LOGIN) --- */}
         <Route
           path="/profil"
-          element={
-            isLoggedIn ? (
-              <ProfilBiro userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <ProfilBiro userRole={userRole} /> : <Navigate to="/" />}
         />
-
-        {/* RUTE TANYA KAMI */}
         <Route
           path="/tanya"
-          element={
-            isLoggedIn ? (
-              <TanyaKami userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <TanyaKami userRole={userRole} /> : <Navigate to="/" />}
         />
-
-        {/* RUTE SEMUA LINK */}
         <Route
           path="/semua-link"
-          element={
-            isLoggedIn ? (
-              <SemuaLink userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <SemuaLink userRole={userRole} /> : <Navigate to="/" />}
         />
-
-        {/* RUTE BERITA KAMI */}
         <Route
           path="/berita-kami"
-          element={
-            isLoggedIn ? (
-              <BeritaKami userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <BeritaKami userRole={userRole} /> : <Navigate to="/" />}
+        />
+
+        {/* --- 4. RUTE EDITOR BERITA (DISATUKAN DI SINI) --- */}
+        <Route
+          path="/berita-kami/editor"
+          element={isLoggedIn ? <EditorBerita userRole={userRole} /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/berita-kami/editor/:id"
+          element={isLoggedIn ? <EditorBerita userRole={userRole} /> : <Navigate to="/" />}
         />
       </Routes>
 
+      {/* MODAL LOGIN (DI LUAR ROUTES) */}
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
