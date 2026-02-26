@@ -94,6 +94,34 @@ export default function EditorBerita({ userRole }) {
     const btnActiveStyle = "bg-blue-600 text-white shadow-inner scale-95";
     const btnInactiveStyle = "bg-white text-slate-500 hover:bg-slate-50 shadow-sm";
 
+    // === HANDLE SHORTCUT KEYBOARD ===
+    const handleKeyDown = (e) => {
+        // 1. Handle Tombol TAB (Menjorok ke dalam)
+        if (e.key === 'Tab') {
+            e.preventDefault(); // Stop browser agar tidak pindah fokus
+            document.execCommand('styleWithCSS', true, null);
+            document.execCommand('indent', false, null); // Membuat teks menjorok (paragraf)
+        }
+
+        // 2. Handle Ctrl + B (Bold)
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            execCmd('bold');
+        }
+
+        // 3. Handle Ctrl + I (Italic)
+        if (e.ctrlKey && e.key === 'i') {
+            e.preventDefault();
+            execCmd('italic');
+        }
+
+        // 4. Handle Ctrl + U (Underline)
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            execCmd('underline');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 pb-20 text-slate-900">
             {/* NAVBAR */}
@@ -157,9 +185,11 @@ export default function EditorBerita({ userRole }) {
                     </div>
 
                     {/* AREA KETIK */}
+                    {/* AREA KETIK DENGAN SHORTCUT */}
                     <div
                         ref={editorRef}
                         contentEditable="true"
+                        onKeyDown={handleKeyDown}     // Tambahkan Ini Untuk Deteksi Tab/Ctrl+B
                         onKeyUp={checkActiveState}
                         onMouseUp={checkActiveState}
                         placeholder="Mulai tulis berita kamu di sini..."
@@ -169,4 +199,4 @@ export default function EditorBerita({ userRole }) {
             </main>
         </div>
     );
-} 
+}  
