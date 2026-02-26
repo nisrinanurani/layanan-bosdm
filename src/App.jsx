@@ -111,7 +111,7 @@ function App() {
       </Routes>
       {/* RUTE EDITOR BERITA */}
       <Route
-        path="/BeritaKami/Editor"
+        path="/berita-kami/editor"
         element={
           isLoggedIn ? (
             <EditorBerita userRole={userRole} />
@@ -122,7 +122,7 @@ function App() {
       />
 
       <Route
-        path="/BeritaKami/Editor/:id"
+        path="/berita-kami/editor/:id"
         element={
           isLoggedIn ? (
             <EditorBerita userRole={userRole} />
