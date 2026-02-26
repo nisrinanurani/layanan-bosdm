@@ -109,28 +109,7 @@ function App() {
           }
         />
       </Routes>
-      {/* RUTE EDITOR BERITA */}
-      <Route
-        path="/berita-kami/editor"
-        element={
-          isLoggedIn ? (
-            <EditorBerita userRole={userRole} />
-          ) : (
-            <Navigate to="/" />
-          )
-        }
-      />
 
-      <Route
-        path="/berita-kami/editor/:id"
-        element={
-          isLoggedIn ? (
-            <EditorBerita userRole={userRole} />
-          ) : (
-            <Navigate to="/" />
-          )
-        }
-      />
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
