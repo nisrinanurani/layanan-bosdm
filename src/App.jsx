@@ -51,9 +51,7 @@ function App() {
           path="/"
           element={
             !isLoggedIn ? (
-              <LandingPage
-                onOpenLogin={() => setIsLoginOpen(true)}
-              />
+              <LandingPage onOpenLogin={() => setIsLoginOpen(true)} />
             ) : (
               <Dashboard userRole={userRole} onLogout={handleLogout} />
             )
@@ -103,6 +101,28 @@ function App() {
           element={
             isLoggedIn ? (
               <BeritaKami userRole={userRole} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* RUTE EDITOR BERITA */}
+        <Route
+          path="/berita-kami/editor"
+          element={
+            isLoggedIn ? (
+              <EditorBerita userRole={userRole} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/berita-kami/editor/:id"
+          element={
+            isLoggedIn ? (
+              <EditorBerita userRole={userRole} />
             ) : (
               <Navigate to="/" />
             )
