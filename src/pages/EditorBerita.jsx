@@ -67,7 +67,7 @@ export default function EditorBerita({ userRole }) {
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             <nav className="border-b bg-white/90 backdrop-blur-md px-8 py-5 sticky top-0 z-50 flex justify-between items-center">
-                <button onClick={() => navigate('/BeritaKami')} className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-[0.2em]">
+                <button onClick={() => navigate('/berita-kami')} className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-[0.2em]">
                     <ArrowLeft className="w-4 h-4" /> Batal
                 </button>
                 <button onClick={handleSave} className="bg-blue-600 text-white px-10 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-blue-700 transition-all">
