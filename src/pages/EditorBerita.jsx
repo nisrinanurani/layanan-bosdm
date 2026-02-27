@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Tema Quill
+import 'react-quill/dist/quill.snow.css';
 import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
 
 export default function EditorBerita({ userRole }) {
@@ -13,7 +13,7 @@ export default function EditorBerita({ userRole }) {
         id: id ? parseInt(id) : Date.now(),
         judul: '',
         fungsi: 'UMUM',
-        gambar: null, // Cover Utama
+        gambar: null,
         konten: '',
         waktu: new Date().toISOString().split('T')[0]
     });
@@ -27,15 +27,19 @@ export default function EditorBerita({ userRole }) {
         }
     }, [id, isAdmin, navigate]);
 
-    // Konfigurasi Toolbar Quill (Sangat Lengkap)
+    // KONFIGURASI TOOLBAR LENGKAP (SESUAI CODE YANG KAMU TEMUKAN)
     const modules = {
         toolbar: [
-            [{ 'header': [1, 2, 3, false] }],
+            [{ 'font': [] }, { 'size': [] }],
             ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block'],
             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'indent': '-1' }, { 'indent': '+1' }], // Ini untuk Tab/Menjorok
-            ['link', 'image'],
-            ['clean'] // Tombol hapus format
+            [{ 'indent': '-1' }, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }, { 'align': [] }],
+            ['link', 'image', 'video', 'formula'],
+            ['clean']
         ],
     };
 
@@ -49,21 +53,15 @@ export default function EditorBerita({ userRole }) {
     };
 
     const handleSave = () => {
-        if (!post.judul || !post.konten || post.konten === '<p><br></p>') {
-            return alert("Lengkapi Judul Dan Isi Berita!");
-        }
-
+        if (!post.judul || !post.konten || post.konten === '<p><br></p>') return alert("Isi judul dan konten!");
         const saved = JSON.parse(localStorage.getItem('data_berita_bosdm') || '[]');
         const updated = id ? saved.map(b => b.id === parseInt(id) ? post : b) : [post, ...saved];
-
         localStorage.setItem('data_berita_bosdm', JSON.stringify(updated));
-        alert("Berita Berhasil Disimpan!");
         navigate('/BeritaKami');
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20 text-slate-900">
-            {/* NAVBAR */}
+        <div className="min-h-screen bg-slate-50 pb-20">
             <nav className="border-b bg-white/90 backdrop-blur-md px-6 py-4 sticky top-0 z-50 flex items-center justify-between">
                 <button onClick={() => navigate('/BeritaKami')} className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-widest">
                     <ArrowLeft className="w-4 h-4" /> Kembali
@@ -73,76 +71,43 @@ export default function EditorBerita({ userRole }) {
                 </button>
             </nav>
 
-            {/* COVER UTAMA */}
-            <div className="relative h-[40vh] bg-slate-900 overflow-hidden">
-                {post.gambar ? (
-                    <img src={post.gambar} className="w-full h-full object-cover opacity-60" alt="Cover" />
-                ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center border-b-4 border-dashed border-slate-700 text-slate-600">
-                        <ImageIcon className="w-12 h-12 mb-2" />
-                        <p className="font-bold uppercase text-[10px]">Pilih Foto Cover Utama</p>
-                    </div>
-                )}
-                <div className="absolute bottom-8 right-8 text-center">
-                    <input type="file" onChange={handleCoverFile} className="hidden" id="coverUpload" accept="image/*" />
-                    <label htmlFor="coverUpload" className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl cursor-pointer hover:bg-slate-50 flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4" /> Ganti Cover
+            <div className="relative h-[35vh] bg-slate-900 overflow-hidden">
+                {post.gambar && <img src={post.gambar} className="w-full h-full object-cover opacity-50" />}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <input type="file" onChange={handleCoverFile} className="hidden" id="cover" accept="image/*" />
+                    <label htmlFor="cover" className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest cursor-pointer border border-white/30">
+                        {post.gambar ? 'Ganti Cover' : 'Pilih Cover Utama'}
                     </label>
                 </div>
             </div>
 
-            <main className="max-w-5xl mx-auto -mt-20 relative z-10 px-6">
-                <div className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-14 border border-slate-100">
+            <main className="max-w-6xl mx-auto -mt-16 relative z-10 px-6">
+                <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 border border-slate-100">
                     <input
                         type="text"
-                        placeholder="KETIK JUDUL BERITA..."
-                        className="w-full text-4xl font-black text-slate-900 outline-none mb-8 uppercase tracking-tighter"
+                        placeholder="JUDUL BERITA..."
+                        className="w-full text-4xl font-black text-slate-900 outline-none mb-6 uppercase tracking-tighter"
                         value={post.judul}
                         onChange={(e) => setPost({ ...post, judul: e.target.value.toUpperCase() })}
                     />
 
-                    {/* QUILL EDITOR */}
-                    <div className="editor-wrapper min-h-[500px]">
+                    {/* RENDER REACT-QUILL DENGAN MODULES LENGKAP */}
+                    <div className="editor-container">
                         <ReactQuill
                             theme="snow"
-                            modules={modules}
                             value={post.konten}
-                            onChange={(content) => setPost({ ...post, konten: content })}
-                            placeholder="Mulai tulis berita kamu di sini..."
-                            className="h-full"
+                            onChange={(val) => setPost({ ...post, konten: val })}
+                            modules={modules}
+                            placeholder="Tulis berita secara epik di sini..."
                         />
                     </div>
                 </div>
             </main>
 
-            {/* CSS CUSTOM UNTUK QUILL */}
             <style>{`
-                .ql-editor {
-                    min-height: 400px;
-                    font-size: 1.1rem;
-                    line-height: 1.8;
-                    color: #475569;
-                    font-family: 'Inter', sans-serif;
-                }
-                .ql-container.ql-snow {
-                    border: 1px solid #e2e8f0 !important;
-                    border-radius: 0 0 1.5rem 1.5rem !important;
-                }
-                .ql-toolbar.ql-snow {
-                    border: 1px solid #e2e8f0 !important;
-                    border-radius: 1.5rem 1.5rem 0 0 !important;
-                    background: #f8fafc !important;
-                    padding: 12px !important;
-                }
-                .ql-editor.ql-blank::before {
-                    color: #cbd5e1 !important;
-                    font-style: normal !important;
-                }
-                .ql-editor img {
-                    border-radius: 1rem;
-                    margin: 20px 0;
-                    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-                }
+                .editor-container .ql-editor { min-height: 500px; font-size: 1.1rem; color: #334155; }
+                .editor-container .ql-toolbar.ql-snow { border-radius: 1rem 1rem 0 0; background: #f8fafc; border-color: #e2e8f0; }
+                .editor-container .ql-container.ql-snow { border-radius: 0 0 1rem 1rem; border-color: #e2e8f0; }
             `}</style>
         </div>
     );
