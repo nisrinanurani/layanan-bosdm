@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Components
@@ -16,7 +16,7 @@ import EditorBerita from './pages/EditorBerita';
 
 function LandingPage({ onOpenLogin }) {
   return (
-    <div className="bg-[#F0F7FF] min-h-screen">
+    <div className="bg-bosdm-sky min-h-screen">
       <NewsHero />
       <PublicStats />
       <BottomCTA onOpenLogin={onOpenLogin} onOpenRegister={onOpenLogin} />

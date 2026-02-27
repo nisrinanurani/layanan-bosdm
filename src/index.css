@@ -11,8 +11,7 @@
 
   body {
     font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
-    color: #1E293B;
-    background-color: #F0F7FF;
+    @apply bg-bosdm-sky text-slate-800;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

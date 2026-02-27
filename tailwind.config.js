@@ -11,9 +11,9 @@ export default {
                 serif: ['Google Sans Display', 'Georgia', 'serif'],
             },
             colors: {
-                'eye-base': '#F0F7FF',
-                'eye-card': '#E1EFFF',
-                'eye-accent': '#8ECAFE',
+                'bosdm-sky': '#86B6F6',
+                'bosdm-paper': '#EEF5FF',
+                'bosdm-navy': '#1E3A8A',
                 'brand-light': '#E0F2FE',
                 'brand-dark': '#0F172A',
                 'brand-primary': '#2563EB',

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export default function Navbar() {
             animate={{ y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                ? 'backdrop-blur-xl bg-[#F0F7FF]/80 border-b border-brand-gray-200/60 shadow-sm'
+                ? 'backdrop-blur-xl bg-bosdm-sky/80 border-b border-brand-gray-200/60 shadow-sm'
                 : 'bg-transparent'
                 }`}
         >
@@ -58,7 +58,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="md:hidden overflow-hidden bg-[#F0F7FF]/95 backdrop-blur-xl border-t border-brand-gray-200/60"
+                        className="md:hidden overflow-hidden bg-bosdm-sky/95 backdrop-blur-xl border-t border-brand-gray-200/60"
                     >
                         <div className="px-4 py-3 space-y-1">
                             {navLinks.map((link) => (

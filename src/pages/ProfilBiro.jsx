@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import {
     ChevronDown, Edit3, Save, X, Plus, ArrowLeft, Trash2,
@@ -221,10 +221,10 @@ export default function ProfilBiro({ userRole }) {
     // RENDER
     // ===========================
     return (
-        <div className="min-h-screen bg-[#F0F7FF] font-sans">
+        <div className="min-h-screen bg-bosdm-sky font-sans">
 
             {/* === NAVBAR === */}
-            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-[#F0F7FF]/95 backdrop-blur-md">
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-bosdm-sky/95 backdrop-blur-md">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         {/* Ganti div kotak merah 'B' dengan tag img ini */}
@@ -296,7 +296,7 @@ export default function ProfilBiro({ userRole }) {
 
                 {/* === SECTION: VISI & MISI === */}
                 <section className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-[#E1EFFF] rounded-3xl p-8 border border-[#8ECAFE]/30 shadow-sm">
+                    <div className="bg-bosdm-paper rounded-3xl p-8 border border-bosdm-navy/20 shadow-sm">
                         <h2 className="text-lg font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">Visi</h2>
                         <InlineEdit
                             value={data.visi}
@@ -307,7 +307,7 @@ export default function ProfilBiro({ userRole }) {
                             className="text-slate-700 leading-relaxed"
                         />
                     </div>
-                    <div className="bg-[#E1EFFF] rounded-3xl p-8 border border-[#8ECAFE]/30 shadow-sm">
+                    <div className="bg-bosdm-paper rounded-3xl p-8 border border-bosdm-navy/20 shadow-sm">
                         <h2 className="text-lg font-black text-purple-600 uppercase tracking-[0.2em] mb-4">Misi</h2>
                         <InlineEdit
                             value={data.misi}
@@ -323,7 +323,7 @@ export default function ProfilBiro({ userRole }) {
                 {/* === SECTION: KEPALA BIRO === */}
                 <section className="mb-16">
                     <h2 className="text-lg font-black text-amber-600 uppercase tracking-[0.2em] mb-6">Kepala Biro</h2>
-                    <div className="bg-[#E1EFFF] rounded-3xl p-8 border border-[#8ECAFE]/30 shadow-sm flex flex-col sm:flex-row items-center gap-8">
+                    <div className="bg-bosdm-paper rounded-3xl p-8 border border-bosdm-navy/20 shadow-sm flex flex-col sm:flex-row items-center gap-8">
                         <div className="flex-shrink-0">
                             {isSuperadmin ? (
                                 <ImageUploader
@@ -390,7 +390,7 @@ export default function ProfilBiro({ userRole }) {
                                 key={fungsi.id}
                                 value={fungsi}
                                 dragListener={false}
-                                className="bg-[#E1EFFF] rounded-2xl border border-[#8ECAFE]/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                                className="bg-bosdm-paper rounded-2xl border border-bosdm-navy/20 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                             >
                                 {/* === HEADER KARTU === */}
                                 <div className="px-6 py-5 flex items-center gap-3">

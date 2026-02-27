@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Link as LinkIcon, Plus, Edit3, Trash2, X,
@@ -125,9 +125,9 @@ export default function SemuaLink({ userRole }) {
     }, [dataLinks, searchLink, filterCategory, selectedDate]);
 
     return (
-        <div className="min-h-screen bg-[#F0F7FF] font-sans pb-20">
+        <div className="min-h-screen bg-bosdm-sky font-sans pb-20">
             {/* NAVBAR */}
-            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-[#F0F7FF]/95 backdrop-blur-md">
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-bosdm-sky/95 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
@@ -148,11 +148,11 @@ export default function SemuaLink({ userRole }) {
                 {/* FILTER BAR (SESUAI GAMBAR) */}
                 <div className="flex flex-col md:flex-row items-end gap-4 mb-6">
                     <div className="relative w-full md:w-80">
-                        <input type="text" placeholder="Cari judul link" className="w-full pl-4 pr-10 py-2.5 bg-[#E1EFFF] border border-slate-200 rounded-full text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500" value={searchLink} onChange={(e) => setSearchLink(e.target.value)} />
+                        <input type="text" placeholder="Cari judul link" className="w-full pl-4 pr-10 py-2.5 bg-bosdm-paper border border-slate-200 rounded-full text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500" value={searchLink} onChange={(e) => setSearchLink(e.target.value)} />
                         <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     </div>
 
-                    <div className="flex items-center gap-2 bg-[#E1EFFF] p-1 border border-slate-200 rounded-lg shadow-sm">
+                    <div className="flex items-center gap-2 bg-bosdm-paper p-1 border border-slate-200 rounded-lg shadow-sm">
                         <input type="date" className="px-3 py-1.5 text-xs text-slate-600 outline-none" onChange={(e) => setSelectedDate(e.target.value)} />
                         <div className="w-px h-4 bg-slate-200"></div>
                         <select className="px-3 py-1.5 text-xs text-slate-600 bg-transparent outline-none cursor-pointer" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
@@ -169,9 +169,9 @@ export default function SemuaLink({ userRole }) {
                 </div>
 
                 {/* TABEL DATA */}
-                <div className="bg-[#E1EFFF] border border-[#8ECAFE]/30 rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-bosdm-paper border border-bosdm-navy/20 rounded-2xl shadow-sm overflow-hidden">
                     <table className="w-full text-left text-[11px] md:text-xs">
-                        <thead className="bg-[#F0F7FF] border-b border-[#8ECAFE]/30 text-slate-400 font-bold uppercase tracking-tight">
+                        <thead className="bg-bosdm-sky border-b border-bosdm-navy/20 text-slate-400 font-bold uppercase tracking-tight">
                             <tr>
                                 <th className="p-4 w-12 text-center">No</th>
                                 <th className="p-4">Judul</th>
@@ -183,7 +183,7 @@ export default function SemuaLink({ userRole }) {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredLinks.map((item, idx) => (
-                                <tr key={item.id} className="hover:bg-[#F0F7FF] transition-colors group">
+                                <tr key={item.id} className="hover:bg-bosdm-sky transition-colors group">
                                     <td className="p-4 text-center text-slate-400">{idx + 1}.</td>
                                     <td className="p-4 font-bold text-slate-800">{item.judul}</td>
                                     <td className="p-4">
@@ -217,19 +217,19 @@ export default function SemuaLink({ userRole }) {
                 {showModal && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-[#E1EFFF] w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-bosdm-paper w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
                             <h3 className="text-2xl font-black mb-6 text-slate-900">{newLinkData.id ? "Edit Data Link" : "Tambah Data Link"}</h3>
 
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Judul Kumpulan</label>
-                                    <input type="text" className="w-full p-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 font-medium" value={newLinkData.judul} onChange={(e) => setNewLinkData({ ...newLinkData, judul: e.target.value })} />
+                                    <input type="text" className="w-full p-4 bg-bosdm-sky border border-slate-200 rounded-2xl outline-none focus:border-blue-500 font-medium" value={newLinkData.judul} onChange={(e) => setNewLinkData({ ...newLinkData, judul: e.target.value })} />
                                 </div>
 
                                 {/* SECTION KELOLA KATEGORI */}
                                 <div>
                                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kategori</label>
-                                    <select className="w-full p-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 cursor-pointer mb-3" value={newLinkData.kategori} onChange={(e) => setNewLinkData({ ...newLinkData, kategori: e.target.value })}>
+                                    <select className="w-full p-4 bg-bosdm-sky border border-slate-200 rounded-2xl outline-none focus:border-blue-500 cursor-pointer mb-3" value={newLinkData.kategori} onChange={(e) => setNewLinkData({ ...newLinkData, kategori: e.target.value })}>
                                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                                     </select>
 
@@ -277,7 +277,7 @@ export default function SemuaLink({ userRole }) {
                             </div>
 
                             <div className="flex gap-3 mt-10">
-                                <button onClick={() => setShowModal(false)} className="flex-1 py-4 font-bold text-slate-400 hover:bg-[#F0F7FF] rounded-2xl transition-all uppercase text-xs">Batal</button>
+                                <button onClick={() => setShowModal(false)} className="flex-1 py-4 font-bold text-slate-400 hover:bg-bosdm-sky rounded-2xl transition-all uppercase text-xs">Batal</button>
                                 <button onClick={handleSaveLinks} className="flex-[2] py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-all uppercase text-xs tracking-widest">
                                     <Save className="w-5 h-5" /> Simpan Perubahan
                                 </button>
