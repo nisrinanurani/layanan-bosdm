@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Components
@@ -17,10 +17,11 @@ import EditorBerita from './pages/EditorBerita';
 function LandingPage({ onOpenLogin }) {
   return (
     <div className="bg-brand-gray-50 min-h-screen">
+      {/* NewsHero sekarang mandiri, Navbar resmi ada di dalamnya */}
       <NewsHero />
       <PublicStats />
-      <BottomCTA onOpenLogin={onOpenLogin} onOpenRegister={onOpenLogin} />
-      <footer className="bg-slate-950 text-slate-600 text-center py-6 text-sm border-t border-slate-900">
+      <BottomCTA onOpenLogin={onOpenLogin} />
+      <footer className="bg-brand-dark text-brand-gray-400 text-center py-8 text-[10px] font-black uppercase tracking-[0.2em] border-t border-white/5">
         &copy; {new Date().getFullYear()} Biro Organisasi dan SDM - BRIN
       </footer>
     </div>
@@ -30,104 +31,102 @@ function LandingPage({ onOpenLogin }) {
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // State Login Simulasi
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState('pegawai');
+  // Persistence: Cek status login dari memori browser
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+  const [userRole, setUserRole] = useState(() => {
+    return localStorage.getItem('userRole') || 'pegawai';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', isLoggedIn);
+    localStorage.setItem('userRole', userRole);
+  }, [isLoggedIn, userRole]);
 
   const handleLoginSuccess = (role) => {
     setUserRole(role);
     setIsLoggedIn(true);
+    setIsLoginOpen(false);
   };
 
   const handleLogout = () => {
-    setUserRole('pegawai');
-    setIsLoggedIn(false);
+    if (window.confirm("Keluar dari aplikasi?")) {
+      setIsLoggedIn(false);
+      setUserRole('pegawai');
+      localStorage.clear();
+    }
   };
 
   return (
     <Router>
       <Routes>
+        {/* HALAMAN UTAMA (LANDING) */}
         <Route
           path="/"
           element={
             !isLoggedIn ? (
               <LandingPage onOpenLogin={() => setIsLoginOpen(true)} />
             ) : (
-              <Dashboard userRole={userRole} onLogout={handleLogout} />
+              <Navigate to="/dashboard" replace />
             )
           }
         />
-        <Route path="/berita/:id" element={<NewsDetail />} />
 
-        {/* RUTE PROFIL BIRO */}
+        {/* DASHBOARD INTERNAL */}
+        <Route
+          path="/dashboard"
+          element={
+            isLoggedIn ? (
+              <Dashboard userRole={userRole} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        {/* AKSES PUBLIK (BISA DIBUKA TANPA LOGIN) */}
+        <Route path="/berita/:id" element={<NewsDetail />} />
+        <Route path="/berita-kami" element={<BeritaKami userRole={isLoggedIn ? userRole : 'pegawai'} />} />
+
+        {/* RUTE TERPROTEKSI (HARUS LOGIN) */}
         <Route
           path="/profil"
-          element={
-            isLoggedIn ? (
-              <ProfilBiro userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <ProfilBiro userRole={userRole} /> : <Navigate to="/" replace />}
         />
-
-        {/* RUTE TANYA KAMI */}
         <Route
           path="/tanya"
-          element={
-            isLoggedIn ? (
-              <TanyaKami userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <TanyaKami userRole={userRole} /> : <Navigate to="/" replace />}
         />
-
-        {/* RUTE SEMUA LINK */}
         <Route
           path="/semua-link"
-          element={
-            isLoggedIn ? (
-              <SemuaLink userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={isLoggedIn ? <SemuaLink userRole={userRole} /> : <Navigate to="/" replace />}
         />
 
-        {/* RUTE BERITA KAMI */}
-        <Route
-          path="/berita-kami"
-          element={
-            isLoggedIn ? (
-              <BeritaKami userRole={userRole} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-
-        {/* RUTE EDITOR BERITA */}
+        {/* RUTE EDITOR (KHUSUS ADMIN/SUPERADMIN) */}
         <Route
           path="/berita-kami/editor"
           element={
-            isLoggedIn ? (
+            isLoggedIn && (userRole === 'admin' || userRole === 'superadmin') ? (
               <EditorBerita userRole={userRole} />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/berita-kami" replace />
             )
           }
         />
         <Route
           path="/berita-kami/editor/:id"
           element={
-            isLoggedIn ? (
+            isLoggedIn && (userRole === 'admin' || userRole === 'superadmin') ? (
               <EditorBerita userRole={userRole} />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/berita-kami" replace />
             )
           }
         />
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <LoginModal

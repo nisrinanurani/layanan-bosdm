@@ -17,7 +17,7 @@ export default function EditorBerita({ userRole }) {
     });
 
     useEffect(() => {
-        if (!isAdmin) navigate('/BeritaKami');
+        if (!isAdmin) navigate('/berita-kami');
         if (id) {
             const saved = JSON.parse(localStorage.getItem('data_berita_bosdm') || '[]');
             const found = saved.find(b => b.id === parseInt(id));
@@ -59,7 +59,7 @@ export default function EditorBerita({ userRole }) {
     return (
         <div className="min-h-screen bg-brand-gray-50 pb-20">
             <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-brand-gray-200 px-8 py-4 flex justify-between items-center">
-                <button onClick={() => navigate('/BeritaKami')} className="flex items-center gap-2 text-brand-gray-600 font-bold text-xs uppercase tracking-widest hover:text-brand-primary transition-colors">
+                <button onClick={() => navigate('/berita-kami')} className="flex items-center gap-2 text-brand-gray-600 font-bold text-xs uppercase tracking-widest hover:text-brand-primary transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Batal
                 </button>
                 <button onClick={handleSave} className="bg-brand-primary text-white px-10 py-3 rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-lg hover:bg-brand-blue-700 transition-all">
