@@ -11,7 +11,7 @@ export default {
                 serif: ['Google Sans Display', 'Georgia', 'serif'],
             },
             colors: {
-                'bosdm-sky': '#86B6F6',
+                'bosdm-sky': '#F3F4F4',
                 'bosdm-paper': '#EEF5FF',
                 'bosdm-navy': '#1E3A8A',
                 'brand-light': '#E0F2FE',
