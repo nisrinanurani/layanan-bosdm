@@ -25,7 +25,7 @@ export default function NewsDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-white pb-20">
+        <div className="min-h-screen bg-[#F0F7FF] pb-20">
             {/* NAVBAR KEMBALI */}
             <nav className="max-w-4xl mx-auto px-6 py-10">
                 <button

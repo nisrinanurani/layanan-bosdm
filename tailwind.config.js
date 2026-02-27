@@ -7,10 +7,13 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                serif: ['Playfair Display', 'Georgia', 'serif'],
+                sans: ['Google Sans', 'system-ui', '-apple-system', 'sans-serif'],
+                serif: ['Google Sans Display', 'Georgia', 'serif'],
             },
             colors: {
+                'eye-base': '#F0F7FF',
+                'eye-card': '#E1EFFF',
+                'eye-accent': '#8ECAFE',
                 'brand-light': '#E0F2FE',
                 'brand-dark': '#0F172A',
                 'brand-primary': '#2563EB',

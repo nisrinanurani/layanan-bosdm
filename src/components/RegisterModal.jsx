@@ -72,14 +72,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative"
+                            className="bg-[#E1EFFF] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative"
                         >
-                            <div className="bg-white p-6 text-center border-b border-slate-100 relative">
+                            <div className="bg-[#E1EFFF] p-6 text-center border-b border-slate-100 relative">
                                 <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
                                 <h2 className="text-2xl font-bold text-slate-800">Daftar Akun Baru</h2>
                                 <p className="text-slate-500 text-sm mt-1">Biro Organisasi dan Sumber Daya Manusia</p>
                             </div>
-                            <div className="p-8 bg-slate-50/50">
+                            <div className="p-8 bg-[#E1EFFF]">
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <input type="text" name="nama" onChange={handleChange} placeholder="Nama Lengkap" className="w-full px-4 py-3 rounded-lg border border-slate-200" required />
                                     <input type="text" name="nip" onChange={handleChange} placeholder="NIP" className="w-full px-4 py-3 rounded-lg border border-slate-200" required />

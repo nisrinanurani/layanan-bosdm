@@ -52,9 +52,9 @@ export default function BeritaKami({ userRole }) {
     }, [dataBerita, searchBerita, filterFungsi, filterTanggal]);
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-20">
+        <div className="min-h-screen bg-[#F0F7FF] font-sans pb-20">
             {/* === NAVBAR === */}
-            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-[#F0F7FF]/95 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img src={logoBrin} alt="Logo BRIN" className="h-10 w-auto object-contain" />
@@ -87,14 +87,14 @@ export default function BeritaKami({ userRole }) {
                         <input
                             type="text"
                             placeholder="Cari judul berita..."
-                            className="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                            className="w-full pl-4 pr-10 py-2.5 bg-[#E1EFFF] border border-slate-200 rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                             value={searchBerita}
                             onChange={(e) => setSearchBerita(e.target.value)}
                         />
                         <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     </div>
 
-                    <div className="flex items-center gap-2 bg-white p-1 border border-slate-200 rounded-lg shadow-sm">
+                    <div className="flex items-center gap-2 bg-[#E1EFFF] p-1 border border-slate-200 rounded-lg shadow-sm">
                         <div className="flex items-center gap-2 px-3">
                             <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
                             <input
@@ -127,7 +127,7 @@ export default function BeritaKami({ userRole }) {
                             <select
                                 value={limit}
                                 onChange={(e) => setLimit(Number(e.target.value))}
-                                className="appearance-none bg-white border border-slate-200 pl-3 pr-7 py-1.5 rounded-md text-slate-900 outline-none cursor-pointer font-bold"
+                                className="appearance-none bg-[#E1EFFF] border border-slate-200 pl-3 pr-7 py-1.5 rounded-md text-slate-900 outline-none cursor-pointer font-bold"
                             >
                                 <option value={10}>10</option>
                                 <option value={50}>50</option>
@@ -140,9 +140,9 @@ export default function BeritaKami({ userRole }) {
                 </div>
 
                 {/* TABEL DATA */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-[#E1EFFF] border border-[#8ECAFE]/30 rounded-2xl shadow-sm overflow-hidden">
                     <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase">
+                        <thead className="bg-[#F0F7FF] border-b border-[#8ECAFE]/30 text-slate-400 font-bold uppercase">
                             <tr>
                                 <th className="p-5 w-16 text-center">no</th>
                                 <th className="p-5">berita</th>
@@ -152,7 +152,7 @@ export default function BeritaKami({ userRole }) {
                         </thead>
                         <tbody className="divide-y divide-slate-50 border-b border-slate-100">
                             {filteredBerita.slice(0, limit).map((item, idx) => (
-                                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                                <tr key={item.id} className="hover:bg-[#F0F7FF] transition-colors">
                                     <td className="p-6 text-center text-slate-400 font-bold">{idx + 1}</td>
                                     <td className="p-6">
                                         <div className="flex flex-col md:flex-row items-start gap-6">

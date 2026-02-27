@@ -25,7 +25,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
             />
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                className="relative bg-white w-full max-w-sm rounded-[40px] shadow-2xl overflow-hidden p-8 text-center"
+                className="relative bg-[#E1EFFF] w-full max-w-sm rounded-[40px] shadow-2xl overflow-hidden p-8 text-center"
             >
                 <div className="mb-8 text-center">
                     <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-4">
@@ -67,7 +67,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                     {/* TOMBOL PEGAWAI */}
                     <button
                         onClick={() => handleQuickLogin('pegawai')}
-                        className="w-full flex items-center gap-4 p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-all group"
+                        className="w-full flex items-center gap-4 p-4 bg-[#E1EFFF] hover:bg-[#F0F7FF] border border-slate-200 rounded-2xl transition-all group"
                     >
                         <div className="bg-slate-400 text-white p-2 rounded-xl group-hover:scale-110 transition-transform">
                             <User className="w-5 h-5" />

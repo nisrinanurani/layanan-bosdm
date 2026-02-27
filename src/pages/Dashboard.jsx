@@ -60,10 +60,10 @@ export default function Dashboard({ userRole, onLogout }) {
     const canManageUsers = currentRole === 'superadmin';
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900 relative pb-20">
+        <div className="min-h-screen bg-[#F0F7FF] font-sans text-slate-900 relative pb-20">
 
             {/* === NAVBAR === */}
-            <nav className="border-b border-slate-100 px-6 py-4 sticky top-0 z-50 bg-white/80 backdrop-blur-md">
+            <nav className="border-b border-slate-100 px-6 py-4 sticky top-0 z-50 bg-[#F0F7FF]/90 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
 
                     {/* Logo BRIN */}
@@ -92,7 +92,7 @@ export default function Dashboard({ userRole, onLogout }) {
                             </div>
 
                             {/* Dropdown Content */}
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+                            <div className="absolute right-0 mt-2 w-48 bg-[#E1EFFF] border border-[#8ECAFE]/40 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
                                 <div className="py-1">
                                     {canManageUsers && (
                                         <button

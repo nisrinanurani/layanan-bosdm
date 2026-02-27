@@ -21,7 +21,7 @@ const COLORS = {
     text: '#0f172a',          // slate-900
     textMuted: '#64748b',     // slate-500
     border: '#e2e8f0',        // slate-200
-    cardBg: '#ffffff',
+    cardBg: '#E1EFFF',
     trackBg: '#f1f5f9',       // slate-100 — bar track
 };
 
@@ -295,7 +295,7 @@ export default function PublicStats() {
                     variants={cardVariants}
                     initial="hidden"
                     animate={inView ? 'visible' : 'hidden'}
-                    className="rounded-2xl bg-white border border-slate-200/80"
+                    className="rounded-2xl bg-[#E1EFFF] border border-[#8ECAFE]/40"
                     style={{
                         boxShadow: '0 4px 20px rgba(151, 210, 227, 0.39), 0 1px 3px rgba(0, 0, 0, 0.04)',
                     }}
@@ -325,7 +325,7 @@ export default function PublicStats() {
                                 {BASE_STATUS.map((d) => (
                                     <div
                                         key={d.name}
-                                        className="text-center p-3 rounded-xl bg-slate-50 border border-slate-100"
+                                        className="text-center p-3 rounded-xl bg-[#F0F7FF] border border-[#8ECAFE]/30"
                                     >
                                         <p className="text-2xl font-bold tracking-tight" style={{ color: d.color }}>
                                             {d.value.toLocaleString('id-ID')}

@@ -153,17 +153,17 @@ export default function TanyaKami({ userRole }) {
     const activeQuestion = riwayat.find(q => q.id === answeringId);
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-20">
+        <div className="min-h-screen bg-[#F0F7FF] font-sans pb-20">
             {/* NAVBAR */}
-            <nav className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+            <nav className="bg-[#F0F7FF] border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
                         <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold">B</div>
                         <span className="font-bold text-lg">Portal BOSDM</span>
                     </div>
                     <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner border border-slate-200">
-                        <button onClick={() => setActiveTab('kirim')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'kirim' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>Kirim Pertanyaan</button>
-                        <button onClick={() => setActiveTab('riwayat')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'riwayat' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>{isAdmin ? 'Monitoring' : 'Riwayat'} <span className="ml-1 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">{riwayat.filter(d => d.status === 'menunggu').length}</span></button>
+                        <button onClick={() => setActiveTab('kirim')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'kirim' ? 'bg-[#E1EFFF] shadow text-blue-600' : 'text-slate-500'}`}>Kirim Pertanyaan</button>
+                        <button onClick={() => setActiveTab('riwayat')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'riwayat' ? 'bg-[#E1EFFF] shadow text-blue-600' : 'text-slate-500'}`}>{isAdmin ? 'Monitoring' : 'Riwayat'} <span className="ml-1 bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">{riwayat.filter(d => d.status === 'menunggu').length}</span></button>
                     </div>
                 </div>
             </nav>
@@ -179,21 +179,21 @@ export default function TanyaKami({ userRole }) {
                                 <p className="text-green-700 font-medium text-sm">Pertanyaan berhasil dikirim!</p>
                             </div>
                         )}
-                        <div className="space-y-6 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                        <div className="space-y-6 bg-[#E1EFFF] p-8 rounded-3xl border border-[#8ECAFE]/30 shadow-sm">
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Unit Tujuan <HelpCircle className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => setShowGuidance(true)} /></label>
-                                <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={formData.unitId} onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}>
+                                <select className="w-full p-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={formData.unitId} onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}>
                                     <option value="">-- Pilih Fungsi/Unit Tujuan --</option>
                                     {units.map(u => <option key={u.id_unit} value={u.id_unit}>{u.fungsi}</option>)}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-3">Judul Masalah</label>
-                                <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={formData.judul} onChange={(e) => setFormData({ ...formData, judul: e.target.value })} />
+                                <input type="text" className="w-full p-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={formData.judul} onChange={(e) => setFormData({ ...formData, judul: e.target.value })} />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-3">Deskripsi Lengkap</label>
-                                <textarea className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all min-h-[150px]" value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} />
+                                <textarea className="w-full p-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all min-h-[150px]" value={formData.deskripsi} onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })} />
                             </div>
                             <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 relative flex flex-col items-center justify-center hover:bg-blue-50/50 transition-all">
                                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} accept=".pdf,image/*" />
@@ -212,14 +212,14 @@ export default function TanyaKami({ userRole }) {
                             <p className="text-slate-500 font-medium text-lg">Semua pertanyaan masuk dari pengguna. Klik baris untuk detail.</p>
                         </div>
 
-                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm mb-8">
+                        <div className="bg-[#E1EFFF] p-6 rounded-3xl border border-[#8ECAFE]/30 shadow-sm mb-8">
                             <div className="relative mb-6">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                                <input type="text" placeholder='Cari pertanyaan...' className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={searchMonitoring} onChange={(e) => setSearchMonitoring(e.target.value)} />
+                                <input type="text" placeholder='Cari pertanyaan...' className="w-full pl-12 pr-4 py-4 bg-[#F0F7FF] border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={searchMonitoring} onChange={(e) => setSearchMonitoring(e.target.value)} />
                             </div>
                             <div className="flex gap-4 border-t border-slate-100 pt-6">
-                                <input type="date" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none cursor-pointer" onChange={(e) => setSelectedDate(e.target.value)} />
-                                <select className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none cursor-pointer" onChange={(e) => setFilterStatus(e.target.value)}>
+                                <input type="date" className="bg-[#F0F7FF] border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none cursor-pointer" onChange={(e) => setSelectedDate(e.target.value)} />
+                                <select className="bg-[#F0F7FF] border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none cursor-pointer" onChange={(e) => setFilterStatus(e.target.value)}>
                                     <option value="semua">Semua Status</option>
                                     <option value="menunggu">Menunggu Jawaban</option>
                                     <option value="dijawab">Sudah Dijawab</option>
@@ -227,9 +227,9 @@ export default function TanyaKami({ userRole }) {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="bg-[#E1EFFF] rounded-3xl border border-[#8ECAFE]/30 shadow-sm overflow-hidden">
                             <table className="w-full text-left">
-                                <thead className="bg-slate-50 border-b border-slate-100">
+                                <thead className="bg-[#F0F7FF] border-b border-[#8ECAFE]/30">
                                     <tr>
                                         <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">No</th>
                                         <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">{isAdmin ? 'Dari' : 'Untuk Unit'}</th>
@@ -300,7 +300,7 @@ export default function TanyaKami({ userRole }) {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-10 overflow-hidden"
+                            className="relative bg-[#E1EFFF] w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-10 overflow-hidden"
                         >
                             {/* Tombol Close */}
                             <button onClick={() => setSelectedPertanyaan(null)} className="absolute top-6 right-6 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
@@ -360,7 +360,7 @@ export default function TanyaKami({ userRole }) {
                 {answeringId && activeQuestion && (
                     <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setAnsweringId(null)} className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm" />
-                        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="relative bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="relative bg-[#E1EFFF] w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                             <div className="p-8 bg-slate-50 border-b border-slate-200 overflow-y-auto max-h-[30%]">
                                 <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] bg-blue-100 px-2 py-0.5 rounded">Preview Pertanyaan</span>
                                 <h4 className="text-xl font-extrabold text-slate-900 mt-2 mb-2">{activeQuestion.judul}</h4>
@@ -399,7 +399,7 @@ export default function TanyaKami({ userRole }) {
                                         <button onClick={addLinkField} className="flex items-center gap-2 text-blue-600 font-bold text-xs hover:underline"><Plus className="w-3 h-3" /> Tambah Link Lain</button>
                                     </div>
                                 </div>
-                                <div className="flex gap-4 sticky bottom-0 bg-white pt-4 border-t border-slate-100">
+                                <div className="flex gap-4 sticky bottom-0 bg-[#E1EFFF] pt-4 border-t border-[#8ECAFE]/30">
                                     <button onClick={() => setAnsweringId(null)} className="flex-1 py-4 font-bold text-slate-400 hover:bg-slate-50 rounded-2xl">Batal</button>
                                     <button onClick={handleSendAnswer} className="flex-[2] py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
                                         <Send className="w-5 h-5" /> Kirim Jawaban Resmi
@@ -416,7 +416,7 @@ export default function TanyaKami({ userRole }) {
                 {redirectingId && (
                     <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setRedirectingId(null)} className="absolute inset-0 bg-red-900/20 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-[#E1EFFF] w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
                             <h3 className="text-xl font-black mb-6 text-red-600 uppercase tracking-tight">Pengaturan Aliran Fungsi</h3>
 
                             {/* 1. SECTION FUNGSI AKTIF */}
@@ -474,7 +474,7 @@ export default function TanyaKami({ userRole }) {
                 {showGuidance && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowGuidance(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[2rem] shadow-2xl p-8 overflow-hidden">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-[#E1EFFF] w-full max-w-xl rounded-[2rem] shadow-2xl p-8 overflow-hidden">
                             <div className="flex justify-between items-center mb-6"><h3 className="font-black text-2xl text-slate-900">Panduan Unit</h3><button onClick={() => setShowGuidance(false)} className="p-2 bg-slate-100 rounded-full"><X className="w-5 h-5" /></button></div>
                             <div className="relative mb-6"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" /><input type="text" placeholder="Cari fungsi..." className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition-all" value={searchTermGuidance} onChange={(e) => setSearchTermGuidance(e.target.value)} /></div>
                             <div className="max-h-[350px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
