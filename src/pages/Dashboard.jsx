@@ -1,111 +1,55 @@
 ﻿import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, User, Bell, Edit3, Plus, Trash2, MessageCircle, Users, X } from 'lucide-react'; // Tambahkan X di sini
+import { LogOut, User, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-// --- TAMBAHKAN IMPORT INI ---
 import logoBrin from '../assets/logo-brin-decs.png';
-// ----------------------------
 
 const DASHBOARD_MENU = [
-    {
-        id: 'profil',
-        title: "PROFIL DAN MENGENAL KAMI",
-        desc: "Visi, Misi, kontak Person Layanan BOSDM",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
-        color: "bg-blue-100",
-    },
-    {
-        id: 'berita',
-        title: "BERITA BOSDM",
-        desc: "Tusi Layanan pusat dan Lksdm",
-        image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
-        color: "bg-blue-500",
-    },
-    {
-        id: 'grafik',
-        title: "GRAFIK KEPEGAWAIAN",
-        desc: "Keadaan Kepegawaian Terkini",
-        image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800",
-        color: "bg-indigo-900",
-    },
-    {
-        id: 'link',
-        title: "KUMPULAN LINK BOSDM",
-        desc: "berhubungan dengan tusi BOSDM",
-        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=800",
-        color: "bg-blue-900",
-    },
-    {
-        id: 'tanya',
-        title: "TANYA KAMI",
-        desc: "Sampaikan kepada kami",
-        image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800",
-        color: "bg-slate-200",
-    },
-    {
-        id: 'download',
-        title: "DOWNLOAD DOKUMEN",
-        desc: "Kumpulan SK, Dokumen, Peraturan terkait",
-        image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800",
-        color: "bg-blue-400",
-    }
+    { id: 'profil', title: "PROFIL DAN MENGENAL KAMI", desc: "Visi, Misi, kontak Person Layanan BOSDM", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800", color: "bg-blue-100" },
+    { id: 'berita', title: "BERITA BOSDM", desc: "Tusi Layanan pusat dan Lksdm", image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800", color: "bg-blue-500" },
+    { id: 'grafik', title: "GRAFIK KEPEGAWAIAN", desc: "Keadaan Kepegawaian Terkini", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800", color: "bg-indigo-900" },
+    { id: 'link', title: "KUMPULAN LINK BOSDM", desc: "berhubungan dengan tusi BOSDM", image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=800", color: "bg-blue-900" },
+    { id: 'tanya', title: "TANYA KAMI", desc: "Sampaikan kepada kami", image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800", color: "bg-slate-200" },
+    { id: 'download', title: "DOWNLOAD DOKUMEN", desc: "Kumpulan SK, Dokumen, Peraturan terkait", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800", color: "bg-blue-400" }
 ];
 
 export default function Dashboard({ userRole, onLogout }) {
     const navigate = useNavigate();
     const currentRole = userRole || 'pegawai';
-
-    // Definisikan izin dengan aman
     const canManageUsers = currentRole === 'superadmin';
 
     return (
-        <div className="min-h-screen bg-bosdm-sky font-sans text-slate-900 relative pb-20">
+        /* BACKGROUND UTAMA: Pakai warna brand-gray-50 agar selaras dengan Editor/Berita */
+        <div className="min-h-screen bg-brand-gray-50 font-sans text-slate-900 relative pb-20 transition-colors duration-500">
 
-            {/* === NAVBAR === */}
-            <nav className="border-b border-slate-100 px-6 py-4 sticky top-0 z-50 bg-bosdm-sky/90 backdrop-blur-md">
+            {/* NAVBAR: Pakai background transparan/putih agar adem */}
+            <nav className="border-b border-brand-gray-200 px-6 py-4 sticky top-0 z-50 bg-white/80 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-
-                    {/* Logo BRIN */}
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-                        <img
-                            src={logoBrin}
-                            alt="Logo BRIN"
-                            className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
-                            onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=BRIN" }}
-                        />
+                        <img src={logoBrin} alt="Logo BRIN" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <div className="h-6 w-px bg-slate-200"></div>
-
-                        {/* Dropdown Profile */}
+                        <div className="h-6 w-px bg-brand-gray-200"></div>
                         <div className="relative group cursor-pointer">
-                            <div className="flex items-center gap-3 group-hover:opacity-80 transition-opacity">
+                            <div className="flex items-center gap-3">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-slate-900">Portal BOSDM</p>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">{currentRole}</p>
+                                    <p className="text-sm font-bold text-brand-dark uppercase tracking-tighter">Portal BOSDM</p>
+                                    <p className="text-[10px] text-brand-primary font-black uppercase tracking-widest">{currentRole}</p>
                                 </div>
-                                <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center">
-                                    <User className="w-6 h-6 text-slate-400" />
+                                <div className="w-10 h-10 rounded-full bg-brand-blue-50 border border-brand-blue-100 flex items-center justify-center">
+                                    <User className="w-6 h-6 text-brand-primary" />
                                 </div>
                             </div>
 
-                            {/* Dropdown Content */}
-                            <div className="absolute right-0 mt-2 w-48 bg-bosdm-paper border border-bosdm-sky/40 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
-                                <div className="py-1">
+                            <div className="absolute right-0 mt-2 w-56 bg-white border border-brand-gray-200 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+                                <div className="py-2">
                                     {canManageUsers && (
-                                        <button
-                                            onClick={() => navigate('/kelola-user')}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 transition-colors"
-                                        >
-                                            <Users className="w-4 h-4" /> Kelola User
+                                        <button onClick={() => navigate('/kelola-user')} className="w-full flex items-center gap-3 px-5 py-3 text-xs font-bold text-brand-dark hover:bg-brand-blue-50 transition-colors uppercase tracking-widest">
+                                            <Users className="w-4 h-4 text-brand-primary" /> Kelola User
                                         </button>
                                     )}
-                                    <button
-                                        onClick={onLogout}
-                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-slate-50"
-                                    >
+                                    <button onClick={onLogout} className="w-full flex items-center gap-3 px-5 py-3 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors border-t border-brand-gray-100 uppercase tracking-widest">
                                         <LogOut className="w-4 h-4" /> Keluar Aplikasi
                                     </button>
                                 </div>
@@ -115,13 +59,13 @@ export default function Dashboard({ userRole, onLogout }) {
                 </div>
             </nav>
 
-            {/* === CONTENT GRID === */}
             <main className="max-w-7xl mx-auto px-6 py-12">
                 <div className="mb-12">
-                    <h1 className="text-3xl font-bold mb-2">Layanan Kepegawaian</h1>
-                    <p className="text-slate-500">Pilih menu layanan yang Anda butuhkan.</p>
+                    <h1 className="text-4xl font-black text-brand-dark uppercase tracking-tighter">Layanan Kepegawaian</h1>
+                    <p className="text-xs font-bold text-brand-primary uppercase tracking-[0.3em] mt-3">Portal Manajemen Konten BOSDM</p>
                 </div>
 
+                {/* CARD TETAP SAMA: Desain asli kamu tetap dipertahankan */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                     {DASHBOARD_MENU.map((item, index) => (
                         <motion.div
@@ -131,9 +75,9 @@ export default function Dashboard({ userRole, onLogout }) {
                             transition={{ delay: index * 0.1, duration: 0.5 }}
                             onClick={() => {
                                 if (item.id === 'profil') navigate('/profil');
-                                if (item.id === 'berita') navigate('/berita-kami', { state: { userRole } });
+                                if (item.id === 'berita') navigate('/BeritaKami');
                                 if (item.id === 'tanya') navigate('/tanya');
-                                if (item.id === 'link') navigate('/semua-link', { state: { userRole } });
+                                if (item.id === 'link') navigate('/semua-link');
                             }}
                             className="group relative cursor-pointer"
                         >
@@ -146,10 +90,10 @@ export default function Dashboard({ userRole, onLogout }) {
                             </div>
 
                             <div className="pr-4">
-                                <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide mb-1 leading-snug group-hover:text-blue-700 transition-colors">
+                                <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide mb-1 leading-snug group-hover:text-brand-primary transition-colors">
                                     {item.title}
                                 </h3>
-                                <p className="text-base text-slate-600 font-medium leading-relaxed">
+                                <p className="text-base text-slate-600 font-medium leading-relaxed line-clamp-2">
                                     {item.desc}
                                 </p>
                             </div>

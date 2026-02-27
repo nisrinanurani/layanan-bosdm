@@ -1,291 +1,44 @@
-﻿import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Search, Link as LinkIcon, Plus, Edit3, Trash2, X,
-    Save, PlusCircle, ArrowLeft, AlertCircle, Globe, ExternalLink
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, ExternalLink, Link as LinkIcon } from 'lucide-react';
 
-// --- IMPORT LOGO ---
-import logoBrin from '../assets/logo-brin-decs.png';
-
-export default function SemuaLink({ userRole }) {
+export default function SemuaLink() {
     const navigate = useNavigate();
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
-    const isSuperAdmin = userRole === 'superadmin';
-
-    // === STATE DATA UTAMA ===
-    const [dataLinks, setDataLinks] = useState(() => {
-        const saved = localStorage.getItem('kumpulan_link_bosdm');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    // === STATE KATEGORI DINAMIS ===
-    const [categories, setCategories] = useState(() => {
-        const savedCats = localStorage.getItem('kategori_link_bosdm');
-        return savedCats ? JSON.parse(savedCats) : ['Internal', 'Eksternal', 'Lainnya'];
-    });
-
-    // === STATE UI & FORM ===
-    const [searchLink, setSearchLink] = useState('');
-    const [filterCategory, setFilterCategory] = useState('Semua');
-    const [selectedDate, setSelectedDate] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const [newCatInput, setNewCatInput] = useState('');
-
-    const [newLinkData, setNewLinkData] = useState({
-        id: null,
-        judul: '',
-        kategori: categories[0],
-        links: ['']
-    });
-
-    // === LOGIK RE-NAME KATEGORI (CASCADE UPDATE) ===
-    const handleRenameCategory = (oldName) => {
-        const newName = prompt(`Ubah nama kategori "${oldName}" menjadi:`, oldName);
-        if (!newName || newName.trim() === "" || newName === oldName) return;
-
-        const trimmedNewName = newName.trim();
-        if (categories.includes(trimmedNewName)) return alert("Nama kategori tersebut sudah ada!");
-
-        // 1. Update daftar kategori
-        const updatedCats = categories.map(cat => cat === oldName ? trimmedNewName : cat);
-        setCategories(updatedCats);
-        localStorage.setItem('kategori_link_bosdm', JSON.stringify(updatedCats));
-
-        // 2. Update SEMUA data link yang menggunakan kategori lama
-        const updatedLinks = dataLinks.map(item =>
-            item.kategori === oldName ? { ...item, kategori: trimmedNewName } : item
-        );
-        setDataLinks(updatedLinks);
-        localStorage.setItem('kumpulan_link_bosdm', JSON.stringify(updatedLinks));
-
-        // 3. Update state form jika sedang terbuka
-        if (newLinkData.kategori === oldName) {
-            setNewLinkData({ ...newLinkData, kategori: trimmedNewName });
-        }
-    };
-
-    // === HANDLER KATEGORI (ADD & REMOVE) ===
-    const handleAddCategory = () => {
-        const val = newCatInput.trim();
-        if (!val) return;
-        if (categories.includes(val)) return alert("Kategori sudah ada!");
-        const updated = [...categories, val];
-        setCategories(updated);
-        localStorage.setItem('kategori_link_bosdm', JSON.stringify(updated));
-        setNewCatInput('');
-    };
-
-    const handleRemoveCategory = (catToDelete) => {
-        if (categories.length <= 1) return alert("Minimal harus ada satu kategori.");
-        if (window.confirm(`Hapus kategori "${catToDelete}"? Semua link dengan kategori ini akan dialihkan ke kategori "${categories[0] === catToDelete ? categories[1] : categories[0]}".`)) {
-            const updatedCats = categories.filter(c => c !== catToDelete);
-            const fallback = updatedCats[0];
-
-            setCategories(updatedCats);
-            localStorage.setItem('kategori_link_bosdm', JSON.stringify(updatedCats));
-
-            const updatedLinks = dataLinks.map(item =>
-                item.kategori === catToDelete ? { ...item, kategori: fallback } : item
-            );
-            setDataLinks(updatedLinks);
-            localStorage.setItem('kumpulan_link_bosdm', JSON.stringify(updatedLinks));
-        }
-    };
-
-    // === HANDLER DATA LINK ===
-    const handleSaveLinks = () => {
-        if (!newLinkData.judul.trim()) return alert("Judul wajib diisi!");
-        const cleanLinks = newLinkData.links.filter(l => l.trim() !== "");
-        if (cleanLinks.length === 0) return alert("Minimal isi satu URL!");
-
-        let updatedData;
-        if (newLinkData.id) {
-            updatedData = dataLinks.map(item =>
-                item.id === newLinkData.id ? { ...item, ...newLinkData, links: cleanLinks, updatedAt: new Date().toISOString() } : item
-            );
-        } else {
-            const newData = { ...newLinkData, id: Date.now(), links: cleanLinks, updatedAt: new Date().toISOString() };
-            updatedData = [newData, ...dataLinks];
-        }
-        setDataLinks(updatedData);
-        localStorage.setItem('kumpulan_link_bosdm', JSON.stringify(updatedData));
-        setShowModal(false);
-        setNewLinkData({ id: null, judul: '', kategori: categories[0], links: [''] });
-    };
-
-    const filteredLinks = useMemo(() => {
-        return dataLinks.filter(item => {
-            const matchesSearch = item.judul.toLowerCase().includes(searchLink.toLowerCase());
-            const matchesCategory = filterCategory === 'Semua' || item.kategori === filterCategory;
-            const matchesDate = !selectedDate || item.updatedAt.includes(selectedDate);
-            return matchesSearch && matchesCategory && matchesDate;
-        });
-    }, [dataLinks, searchLink, filterCategory, selectedDate]);
+    const links = [
+        { title: "Portal Utama BRIN", url: "https://brin.go.id", desc: "Akses ke informasi riset nasional" },
+        { title: "E-Office", url: "#", desc: "Sistem persuratan digital" },
+        { title: "Layanan SDM", url: "#", desc: "Kelola data kepegawaian Anda" }
+    ];
 
     return (
-        <div className="min-h-screen bg-bosdm-sky font-sans pb-20">
-            {/* NAVBAR */}
-            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-bosdm-sky/95 backdrop-blur-md">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-                        <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
-                        <span className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">Portal BOSDM</span>
-                    </div>
-                    <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
-                        <ArrowLeft className="w-4 h-4" /> Kembali
-                    </button>
-                </div>
-            </nav>
+        <div className="min-h-screen bg-brand-gray-50 p-8 md:p-12">
+            <div className="max-w-5xl mx-auto">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-brand-gray-400 font-black text-[10px] uppercase tracking-widest mb-10 hover:text-brand-primary">
+                    <ArrowLeft className="w-4 h-4" /> Kembali
+                </button>
 
-            <main className="max-w-7xl mx-auto py-12 px-6">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-black text-slate-900 uppercase">Kumpulan Link</h1>
-                    <p className="text-slate-500 text-sm">Akses cepat tautan penting Biro Organisasi dan SDM BRIN.</p>
+                <div className="mb-12">
+                    <h1 className="text-4xl font-black text-brand-dark uppercase tracking-tighter">Kumpulan Link</h1>
+                    <p className="text-xs font-bold text-brand-primary uppercase tracking-[0.3em] mt-2">Akses Cepat Layanan BOSDM</p>
                 </div>
 
-                {/* FILTER BAR (SESUAI GAMBAR) */}
-                <div className="flex flex-col md:flex-row items-end gap-4 mb-6">
-                    <div className="relative w-full md:w-80">
-                        <input type="text" placeholder="Cari judul link" className="w-full pl-4 pr-10 py-2.5 bg-bosdm-paper border border-slate-200 rounded-full text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500" value={searchLink} onChange={(e) => setSearchLink(e.target.value)} />
-                        <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    </div>
-
-                    <div className="flex items-center gap-2 bg-bosdm-paper p-1 border border-slate-200 rounded-lg shadow-sm">
-                        <input type="date" className="px-3 py-1.5 text-xs text-slate-600 outline-none" onChange={(e) => setSelectedDate(e.target.value)} />
-                        <div className="w-px h-4 bg-slate-200"></div>
-                        <select className="px-3 py-1.5 text-xs text-slate-600 bg-transparent outline-none cursor-pointer" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-                            <option value="Semua">Semua Kategori</option>
-                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </div>
-
-                    {isAdmin && (
-                        <button onClick={() => { setNewLinkData({ id: null, judul: '', kategori: categories[0], links: [''] }); setShowModal(true); }} className="ml-auto bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100">
-                            <Plus className="w-4 h-4" /> Tambah Data
-                        </button>
-                    )}
-                </div>
-
-                {/* TABEL DATA */}
-                <div className="bg-bosdm-paper border border-bosdm-navy/20 rounded-2xl shadow-sm overflow-hidden">
-                    <table className="w-full text-left text-[11px] md:text-xs">
-                        <thead className="bg-bosdm-sky border-b border-bosdm-navy/20 text-slate-400 font-bold uppercase tracking-tight">
-                            <tr>
-                                <th className="p-4 w-12 text-center">No</th>
-                                <th className="p-4">Judul</th>
-                                <th className="p-4">Link URL</th>
-                                <th className="p-4">Kategori</th>
-                                <th className="p-4">Waktu</th>
-                                {isAdmin && <th className="p-4 text-center">Aksi</th>}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {filteredLinks.map((item, idx) => (
-                                <tr key={item.id} className="hover:bg-bosdm-sky transition-colors group">
-                                    <td className="p-4 text-center text-slate-400">{idx + 1}.</td>
-                                    <td className="p-4 font-bold text-slate-800">{item.judul}</td>
-                                    <td className="p-4">
-                                        <div className="flex flex-col gap-1.5">
-                                            {item.links.map((link, i) => (
-                                                <a key={i} href={link} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
-                                                    <LinkIcon className="w-3 h-3" /> {link}
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </td>
-                                    <td className="p-4"><span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black uppercase">{item.kategori}</span></td>
-                                    <td className="p-4 text-slate-500 font-medium">{new Date(item.updatedAt).toLocaleDateString('id-ID')}</td>
-                                    {isAdmin && (
-                                        <td className="p-4">
-                                            <div className="flex justify-center gap-3">
-                                                <button onClick={() => { setNewLinkData(item); setShowModal(true); }} className="text-amber-500 hover:text-amber-600"><Edit3 className="w-4 h-4" /></button>
-                                                <button onClick={() => { if (confirm("Hapus data?")) { setDataLinks(dataLinks.filter(d => d.id !== item.id)); localStorage.setItem('kumpulan_link_bosdm', JSON.stringify(dataLinks.filter(d => d.id !== item.id))); } }} className="text-red-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
-                                            </div>
-                                        </td>
-                                    )}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </main>
-
-            {/* MODAL TAMBAH/EDIT */}
-            <AnimatePresence>
-                {showModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-bosdm-paper w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
-                            <h3 className="text-2xl font-black mb-6 text-slate-900">{newLinkData.id ? "Edit Data Link" : "Tambah Data Link"}</h3>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Judul Kumpulan</label>
-                                    <input type="text" className="w-full p-4 bg-bosdm-sky border border-slate-200 rounded-2xl outline-none focus:border-blue-500 font-medium" value={newLinkData.judul} onChange={(e) => setNewLinkData({ ...newLinkData, judul: e.target.value })} />
-                                </div>
-
-                                {/* SECTION KELOLA KATEGORI */}
-                                <div>
-                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kategori</label>
-                                    <select className="w-full p-4 bg-bosdm-sky border border-slate-200 rounded-2xl outline-none focus:border-blue-500 cursor-pointer mb-3" value={newLinkData.kategori} onChange={(e) => setNewLinkData({ ...newLinkData, kategori: e.target.value })}>
-                                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                    </select>
-
-                                    {isSuperAdmin && (
-                                        <div className="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase mb-3 tracking-widest">Superadmin Editor Kategori</p>
-                                            <div className="flex gap-2 mb-4">
-                                                <input type="text" placeholder="Ketik kategori baru..." className="flex-1 px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-500" value={newCatInput} onChange={(e) => setNewCatInput(e.target.value)} />
-                                                <button onClick={handleAddCategory} className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-700">TAMBAH</button>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {categories.map(cat => (
-                                                    <div key={cat} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 shadow-sm">
-                                                        <span>{cat}</span>
-                                                        <div className="flex gap-1 ml-1 border-l pl-2 border-slate-100">
-                                                            <button onClick={() => handleRenameCategory(cat)} className="text-blue-400 hover:text-blue-600"><Edit3 className="w-3 h-3" /></button>
-                                                            <button onClick={() => handleRemoveCategory(cat)} className="text-red-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* INPUT URL LINKS */}
-                                <div>
-                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Daftar Link URL</label>
-                                    <div className="space-y-3">
-                                        {newLinkData.links.map((link, idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <input type="text" className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-blue-600 font-medium" value={link} onChange={(e) => {
-                                                    const updated = [...newLinkData.links];
-                                                    updated[idx] = e.target.value;
-                                                    setNewLinkData({ ...newLinkData, links: updated });
-                                                }} />
-                                                {idx > 0 && <button onClick={() => setNewLinkData({ ...newLinkData, links: newLinkData.links.filter((_, i) => i !== idx) })} className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>}
-                                            </div>
-                                        ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {links.map((link, idx) => (
+                        <a key={idx} href={link.url} target="_blank" rel="noreferrer"
+                            className="group bg-white p-8 rounded-[2.5rem] border border-brand-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex justify-between items-center">
+                            <div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="p-2 bg-brand-blue-50 text-brand-primary rounded-lg">
+                                        <LinkIcon className="w-4 h-4" />
                                     </div>
-                                    <button onClick={() => setNewLinkData({ ...newLinkData, links: [...newLinkData.links, ''] })} className="mt-3 flex items-center gap-2 text-blue-600 font-bold text-xs hover:underline">
-                                        <PlusCircle className="w-4 h-4" /> Tambah URL Lain
-                                    </button>
+                                    <h3 className="font-black text-brand-dark uppercase text-sm tracking-tight group-hover:text-brand-primary">{link.title}</h3>
                                 </div>
+                                <p className="text-xs text-brand-gray-500 font-medium">{link.desc}</p>
                             </div>
-
-                            <div className="flex gap-3 mt-10">
-                                <button onClick={() => setShowModal(false)} className="flex-1 py-4 font-bold text-slate-400 hover:bg-bosdm-sky rounded-2xl transition-all uppercase text-xs">Batal</button>
-                                <button onClick={handleSaveLinks} className="flex-[2] py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-all uppercase text-xs tracking-widest">
-                                    <Save className="w-5 h-5" /> Simpan Perubahan
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+                            <ExternalLink className="w-5 h-5 text-brand-gray-200 group-hover:text-brand-primary" />
+                        </a>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
