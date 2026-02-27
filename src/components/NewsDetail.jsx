@@ -25,7 +25,6 @@ export default function NewsDetail() {
     }
 
     return (
-        /* BACKGROUND UTAMA: Pakai abu-abu sangat muda kebiruan (Eye-Care) */
         <div className="min-h-screen bg-brand-gray-50 pb-20 font-sans">
 
             {/* NAVBAR KEMBALI */}
