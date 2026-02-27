@@ -195,7 +195,186 @@ export default function ProfilBiro({ userRole }) {
                 </div>
 
                 {/* Bagian Fungsi & Tugas tetap menggunakan Reorder Group dengan penyesuaian warna bosdm-card */}
-                {/* ... (lanjutkan sisa kode Fungsi & Tugas dengan mengganti bg-bosdm-paper ke bg-white) ... */}
+                {/* === SECTION: FUNGSI-FUNGSI BIRO === */}
+                <section>
+                    <div className="flex items-center justify-between mb-10">
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-[10px] font-black text-brand-primary uppercase tracking-[0.4em]">Fungsi & Tugas</h2>
+                            <div className="h-px w-20 bg-brand-blue-200"></div>
+                        </div>
+                        {isSuperadmin && (
+                            <button
+                                onClick={() => {
+                                    const newFungsi = {
+                                        id: Date.now(),
+                                        title: 'FUNGSI BARU',
+                                        deskripsi: '',
+                                        tusi: ['Tugas baru'],
+                                    };
+                                    setData(prev => ({ ...prev, fungsiList: [...prev.fungsiList, newFungsi] }));
+                                    setOpenCards(prev => ({ ...prev, [newFungsi.id]: true }));
+                                }}
+                                className="flex items-center gap-2 bg-brand-primary text-white hover:bg-brand-blue-800 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-brand-blue-100"
+                            >
+                                <Plus className="w-4 h-4" /> Tambah Fungsi
+                            </button>
+                        )}
+                    </div>
+
+                    <Reorder.Group
+                        axis="y"
+                        values={data.fungsiList}
+                        onReorder={(newOrder) => setData(prev => ({ ...prev, fungsiList: newOrder }))}
+                        className="space-y-6"
+                    >
+                        {data.fungsiList.map((fungsi, fIdx) => (
+                            <Reorder.Item
+                                key={fungsi.id}
+                                value={fungsi}
+                                dragListener={false}
+                                className="bg-white rounded-[2.5rem] border border-brand-gray-200 shadow-sm hover:shadow-xl transition-all overflow-hidden"
+                            >
+                                {/* HEADER KARTU */}
+                                <div className="px-8 py-6 flex items-center justify-between">
+                                    <div className="flex items-center gap-4 flex-1">
+                                        {isSuperadmin && (
+                                            <div className="flex flex-col gap-1 text-brand-gray-200">
+                                                <button onClick={() => {
+                                                    const list = [...data.fungsiList];
+                                                    if (fIdx > 0) {
+                                                        [list[fIdx], list[fIdx - 1]] = [list[fIdx - 1], list[fIdx]];
+                                                        setData(prev => ({ ...prev, fungsiList: list }));
+                                                    }
+                                                }} className="hover:text-brand-primary"><ArrowUp className="w-4 h-4" /></button>
+                                                <button onClick={() => {
+                                                    const list = [...data.fungsiList];
+                                                    if (fIdx < list.length - 1) {
+                                                        [list[fIdx], list[fIdx + 1]] = [list[fIdx + 1], list[fIdx]];
+                                                        setData(prev => ({ ...prev, fungsiList: list }));
+                                                    }
+                                                }} className="hover:text-brand-primary"><ArrowDown className="w-4 h-4" /></button>
+                                            </div>
+                                        )}
+                                        <div className="cursor-pointer flex-1" onClick={() => toggleCard(fungsi.id)}>
+                                            <InlineEdit
+                                                value={fungsi.title}
+                                                onSave={(v) => {
+                                                    const newList = data.fungsiList.map(f => f.id === fungsi.id ? { ...f, title: v } : f);
+                                                    setData(prev => ({ ...prev, fungsiList: newList }));
+                                                }}
+                                                canEdit={isSuperadmin}
+                                                label="Nama Fungsi"
+                                                className="font-black text-brand-dark text-lg uppercase tracking-tight"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        {isSuperadmin && (
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Hapus fungsi ini?')) {
+                                                        setData(prev => ({ ...prev, fungsiList: prev.fungsiList.filter(f => f.id !== fungsi.id) }));
+                                                    }
+                                                }}
+                                                className="p-2 text-brand-gray-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                        <button onClick={() => toggleCard(fungsi.id)} className="p-2 bg-brand-gray-50 text-brand-primary rounded-xl">
+                                            <motion.div animate={{ rotate: openCards[fungsi.id] ? 180 : 0 }}>
+                                                <ChevronDown className="w-5 h-5" />
+                                            </motion.div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* BODY KARTU */}
+                                <AnimatePresence>
+                                    {openCards[fungsi.id] && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="overflow-hidden border-t border-brand-gray-50"
+                                        >
+                                            <div className="p-8 space-y-8 bg-brand-gray-50/30">
+                                                <div>
+                                                    <h4 className="text-[9px] font-black text-brand-primary uppercase tracking-[0.2em] mb-3">Deskripsi Fungsi</h4>
+                                                    <InlineEdit
+                                                        value={fungsi.deskripsi}
+                                                        onSave={(v) => {
+                                                            const newList = data.fungsiList.map(f => f.id === fungsi.id ? { ...f, deskripsi: v } : f);
+                                                            setData(prev => ({ ...prev, fungsiList: newList }));
+                                                        }}
+                                                        canEdit={isSuperadmin}
+                                                        label="Deskripsi"
+                                                        multiline
+                                                        className="text-brand-gray-600 font-medium leading-relaxed"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-[9px] font-black text-brand-primary uppercase tracking-[0.2em]">Tugas & Fungsi (Tusi)</h4>
+                                                        {isSuperadmin && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newList = data.fungsiList.map(f => f.id === fungsi.id ? { ...f, tusi: [...f.tusi, 'Tugas baru'] } : f);
+                                                                    setData(prev => ({ ...prev, fungsiList: newList }));
+                                                                }}
+                                                                className="text-[10px] font-black text-brand-primary bg-white px-3 py-1 rounded-lg border border-brand-blue-100 hover:bg-brand-primary hover:text-white transition-all"
+                                                            >
+                                                                + Tambah Poin
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    <ul className="space-y-3">
+                                                        {fungsi.tusi.map((t, tIdx) => (
+                                                            <li key={tIdx} className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-brand-gray-100 group/tusi">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-brand-primary mt-2" />
+                                                                <div className="flex-1">
+                                                                    {isSuperadmin ? (
+                                                                        <TusiItem
+                                                                            value={t}
+                                                                            onSave={(v) => {
+                                                                                const newList = data.fungsiList.map(f => {
+                                                                                    if (f.id === fungsi.id) {
+                                                                                        const newTusi = [...f.tusi];
+                                                                                        newTusi[tIdx] = v;
+                                                                                        return { ...f, tusi: newTusi };
+                                                                                    }
+                                                                                    return f;
+                                                                                });
+                                                                                setData(prev => ({ ...prev, fungsiList: newList }));
+                                                                            }}
+                                                                            onDelete={() => {
+                                                                                const newList = data.fungsiList.map(f => {
+                                                                                    if (f.id === fungsi.id) {
+                                                                                        return { ...f, tusi: f.tusi.filter((_, i) => i !== tIdx) };
+                                                                                    }
+                                                                                    return f;
+                                                                                });
+                                                                                setData(prev => ({ ...prev, fungsiList: newList }));
+                                                                            }}
+                                                                        />
+                                                                    ) : (
+                                                                        <span className="text-sm font-bold text-brand-gray-600">{t}</span>
+                                                                    )}
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </Reorder.Item>
+                        ))}
+                    </Reorder.Group>
+                </section>
             </main>
         </div>
     );
