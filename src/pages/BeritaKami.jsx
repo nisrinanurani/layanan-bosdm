@@ -1,167 +1,195 @@
 ﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Newspaper, Image as ImageIcon, ArrowLeft } from 'lucide-react';
+import {
+    Plus, Search, Calendar, ChevronDown,
+    Newspaper, Image as ImageIcon, ArrowLeft,
+    Edit3, Trash2, Eye, LayoutGrid, AlertCircle
+} from 'lucide-react';
 
 export default function BeritaKami({ userRole }) {
     const navigate = useNavigate();
-    const [data, setData] = useState([]);
-    const [filterTipe, setFilterTipe] = useState('SEMUA');
     const isAdmin = ['superadmin', 'admin'].includes(userRole);
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterTipe, setFilterTipe] = useState('Semua Kategori');
 
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('data_berita_bosdm') || '[]');
         setData(saved);
     }, []);
 
-    // 1. Logic Toggle Hero dengan Proteksi Limit 10
-    const toggleHero = (id) => {
+    // Logic Toggle Hero dengan Checkbox & Limit 10
+    const handleToggleHero = (id) => {
         if (!isAdmin) return;
-        const currentHeroCount = data.filter(i => i.isHero === true).length;
-        const target = data.find(i => i.id === id);
 
-        // Proteksi Limit 10
-        if (!target.isHero && currentHeroCount >= 10) {
-            alert("⚠️ Batas Maksimal! Slot halaman depan sudah penuh (10/10). Sembunyikan konten lain terlebih dahulu.");
-            return;
-        }
+        const updatedData = data.map(item => {
+            if (item.id === id) {
+                const currentHeroCount = data.filter(i => i.isHero).length;
 
-        const updated = data.map(item => {
-            if (item.id === id) return { ...item, isHero: !item.isHero };
+                // Jika ingin menceklis (mengaktifkan) tapi sudah 10
+                if (!item.isHero && currentHeroCount >= 10) {
+                    alert("⚠️ Batas Maksimal Tercapai! Hanya 10 konten yang boleh tampil di Beranda.");
+                    return item;
+                }
+                return { ...item, isHero: !item.isHero };
+            }
             return item;
         });
 
-        localStorage.setItem('data_berita_bosdm', JSON.stringify(updated));
-        setData(updated);
+        setData(updatedData);
+        localStorage.setItem('data_berita_bosdm', JSON.stringify(updatedData));
     };
 
-    // 2. Logic Filter Tipe
-    const filteredData = data.filter(item => {
-        if (filterTipe === 'SEMUA') return true;
-        if (filterTipe === 'INFOGRAFIS') return item.tipe === 'FLYER';
-        return item.tipe === filterTipe;
-    });
+    const handleDelete = (id) => {
+        if (window.confirm("Hapus konten ini secara permanen?")) {
+            const updated = data.filter(item => item.id !== id);
+            setData(updated);
+            localStorage.setItem('data_berita_bosdm', JSON.stringify(updated));
+        }
+    };
 
-    // 3. Counter Slot Beranda
-    const currentHeroCount = data.filter(item => item.isHero === true).length;
+    const heroItems = data.filter(item => item.isHero).slice(0, 10);
+    const currentHeroCount = heroItems.length;
 
     return (
-        <div className="p-8 bg-brand-gray-50 min-h-screen font-sans">
-            {/* HEADER & COUNTER */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
-                <div>
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="flex items-center gap-2 text-brand-gray-400 font-black text-[10px] uppercase tracking-widest mb-4 hover:text-brand-primary transition-colors"
-                    >
+        <div className="min-h-screen bg-brand-gray-50 p-6 md:p-12 font-sans">
+            <div className="max-w-[1600px] mx-auto">
+
+                {/* HEADER */}
+                <header className="flex justify-between items-center mb-12">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-brand-primary p-2 rounded-xl shadow-lg shadow-brand-blue-100">
+                            <Newspaper className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="h-6 w-px bg-brand-gray-200"></div>
+                        <h2 className="text-xl font-black text-brand-dark uppercase tracking-tighter">Pusat Manajemen Konten</h2>
+                    </div>
+                    <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-brand-gray-400 font-black text-[10px] uppercase tracking-widest hover:text-brand-primary transition-all">
                         <ArrowLeft className="w-4 h-4" /> Kembali ke Dashboard
                     </button>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter text-brand-dark leading-none">Manajemen Konten</h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-primary mt-3">Layanan Publikasi BOSDM</p>
-                </div>
+                </header>
 
-                <div className="flex flex-col items-end gap-3">
-                    <div className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border transition-all shadow-sm ${currentHeroCount >= 10 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-brand-blue-50 text-brand-primary border-brand-blue-100'
-                        }`}>
-                        Slot Beranda: {currentHeroCount} / 10
+                {/* HERO PREVIEW & NOTE */}
+                <section className="mb-16">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                        <div className="flex items-center gap-3">
+                            <LayoutGrid className="w-5 h-5 text-brand-primary" />
+                            <h2 className="text-sm font-black uppercase tracking-widest text-brand-dark">Preview Slot Hero ({currentHeroCount}/10)</h2>
+                        </div>
+                        {/* CATATAN PENTING */}
+                        <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl">
+                            <AlertCircle className="w-4 h-4 text-amber-600" />
+                            <p className="text-[10px] font-black text-amber-700 uppercase tracking-tight">
+                                Catatan: Hanya 10 konten pilihan yang akan ditayangkan di NewsHero halaman depan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
+                        {heroItems.length > 0 ? heroItems.map((hero) => (
+                            <div key={hero.id} className="min-w-[280px] h-40 bg-brand-dark rounded-[2.5rem] relative overflow-hidden group shadow-xl border-4 border-white shrink-0">
+                                <img src={hero.tipe === 'BERITA' ? hero.gambar : hero.flyer} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="Preview" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/90 to-transparent p-6 flex flex-col justify-end">
+                                    <span className="text-[8px] font-black text-brand-primary bg-white px-2 py-0.5 rounded-full w-fit mb-2 uppercase">{hero.tipe}</span>
+                                    <h3 className="text-white text-[10px] font-black uppercase leading-tight line-clamp-2">{hero.judul}</h3>
+                                </div>
+                            </div>
+                        )) : (
+                            <div className="w-full py-10 border-2 border-dashed border-brand-gray-200 rounded-[2.5rem] flex items-center justify-center bg-white/50">
+                                <p className="text-brand-gray-300 font-bold uppercase text-[10px] tracking-[0.3em]">Gunakan ceklis di bawah untuk memilih konten Hero</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* FILTER AREA */}
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-10">
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-gray-300" />
+                            <input
+                                type="text"
+                                placeholder="Cari judul..."
+                                className="w-full pl-14 pr-6 py-4 rounded-[1.5rem] border border-brand-gray-200 bg-white outline-none shadow-sm font-medium text-sm focus:border-brand-primary transition-all"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center bg-white border border-brand-gray-200 rounded-[1.5rem] shadow-sm overflow-hidden">
+                            <div className="flex items-center gap-3 px-6 py-4 border-r border-brand-gray-100 cursor-pointer hover:bg-brand-gray-50 transition-colors">
+                                <span className="text-brand-gray-400 text-sm font-medium">Semua Tanggal</span>
+                                <Calendar className="w-5 h-5 text-brand-gray-300" />
+                            </div>
+                            <div className="px-6 py-4 flex items-center gap-8 min-w-[180px] cursor-pointer hover:bg-brand-gray-50 transition-colors">
+                                <span className="text-brand-gray-400 text-sm font-medium">{filterTipe}</span>
+                                <ChevronDown className="w-5 h-5 text-brand-gray-300" />
+                            </div>
+                        </div>
                     </div>
                     {isAdmin && (
-                        <button
-                            onClick={() => navigate('/berita-kami/editor')}
-                            className="bg-brand-dark text-white px-8 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:bg-brand-primary transition-all shadow-xl shadow-brand-blue-100"
-                        >
-                            <Plus className="w-4 h-4" /> Unggah Konten Baru
+                        <button onClick={() => navigate('/berita-kami/editor')} className="w-full md:w-auto bg-brand-primary text-white px-10 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-brand-blue-100 hover:bg-brand-dark transition-all flex items-center justify-center gap-3">
+                            <Plus className="w-5 h-5" /> Unggah Konten Baru
                         </button>
                     )}
                 </div>
-            </div>
 
-            {/* FILTER BUTTONS */}
-            <div className="flex gap-3 mb-8">
-                {['SEMUA', 'BERITA', 'INFOGRAFIS'].map((t) => (
-                    <button
-                        key={t}
-                        onClick={() => setFilterTipe(t)}
-                        className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-sm ${filterTipe === t
-                                ? 'bg-brand-dark text-white'
-                                : 'bg-white text-brand-gray-400 border border-brand-gray-100 hover:border-brand-primary hover:text-brand-primary'
-                            }`}
-                    >
-                        {t}
-                    </button>
-                ))}
-            </div>
-
-            {/* TABEL DAFTAR KONTEN */}
-            <div className="bg-white rounded-[3rem] shadow-xl shadow-brand-blue-100/20 border border-brand-gray-100 overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-brand-gray-50/50 border-b border-brand-gray-100">
-                        <tr>
-                            <th className="p-6 font-black text-[10px] uppercase tracking-[0.2em] text-brand-gray-400">Judul Konten</th>
-                            <th className="p-6 font-black text-[10px] uppercase tracking-[0.2em] text-brand-gray-400 text-center">Kategori</th>
-                            {isAdmin && <th className="p-6 font-black text-[10px] uppercase tracking-[0.2em] text-brand-gray-400 text-center">Status Beranda</th>}
-                            <th className="p-6 font-black text-[10px] uppercase tracking-[0.2em] text-brand-gray-400 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-brand-gray-50">
-                        {filteredData.length > 0 ? filteredData.map((item) => (
-                            <tr key={item.id} className="hover:bg-brand-blue-50/30 transition-colors group">
-                                <td className="p-6">
-                                    <div className="font-black text-brand-dark uppercase text-xs mb-1 group-hover:text-brand-primary transition-colors">{item.judul}</div>
-                                    <div className="text-[9px] font-bold text-brand-gray-300 uppercase tracking-widest">{new Date(item.waktu).toLocaleDateString()}</div>
-                                </td>
-
-                                <td className="p-6 text-center">
-                                    <span className={`px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-tighter flex items-center justify-center gap-2 w-fit mx-auto ${item.tipe === 'BERITA'
-                                            ? 'bg-brand-blue-50 text-brand-primary'
-                                            : 'bg-indigo-50 text-indigo-600'
-                                        }`}>
-                                        {item.tipe === 'BERITA' ? <Newspaper className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
-                                        {item.tipe === 'BERITA' ? 'Berita' : 'Infografis/Flyer'}
-                                    </span>
-                                </td>
-
-                                {isAdmin && (
-                                    <td className="p-6 text-center">
-                                        <button
-                                            onClick={() => toggleHero(item.id)}
-                                            className={`px-5 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${item.isHero
-                                                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100'
-                                                    : 'bg-brand-gray-100 text-brand-gray-300 hover:bg-brand-gray-200'
-                                                }`}
-                                        >
-                                            {item.isHero ? '● Tayang' : '○ Sembunyi'}
-                                        </button>
+                {/* TABLE DENGAN CHECKBOX */}
+                <div className="bg-white rounded-[3rem] shadow-sm border border-brand-gray-100 overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b border-brand-gray-50 bg-brand-gray-50/20">
+                                {isAdmin && <th className="p-8 font-black text-[11px] uppercase text-brand-gray-300 text-center">Tampilkan</th>}
+                                <th className="p-8 font-black text-[11px] uppercase tracking-widest text-brand-gray-300">Detail Konten</th>
+                                <th className="p-8 font-black text-[11px] uppercase tracking-widest text-brand-gray-300 text-center">Tipe</th>
+                                <th className="p-8 font-black text-[11px] uppercase tracking-widest text-brand-gray-300 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-brand-gray-50">
+                            {data.filter(i => i.judul.toLowerCase().includes(searchTerm.toLowerCase())).map((item) => (
+                                <tr key={item.id} className={`hover:bg-brand-blue-50/20 transition-all group ${item.isHero ? 'bg-brand-blue-50/10' : ''}`}>
+                                    {isAdmin && (
+                                        <td className="p-8 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={item.isHero || false}
+                                                onChange={() => handleToggleHero(item.id)}
+                                                disabled={!item.isHero && currentHeroCount >= 10}
+                                                className="w-6 h-6 rounded-lg border-2 border-brand-gray-200 text-brand-primary focus:ring-brand-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+                                            />
+                                        </td>
+                                    )}
+                                    <td className="p-8">
+                                        <div className="flex items-center gap-6">
+                                            <img src={item.tipe === 'BERITA' ? item.gambar : item.flyer} className="w-20 h-14 rounded-xl object-cover shadow-sm bg-brand-dark" alt="thumb" />
+                                            <div>
+                                                <div className="font-black text-brand-dark uppercase text-sm group-hover:text-brand-primary transition-colors mb-1">{item.judul}</div>
+                                                <div className="text-[10px] font-bold text-brand-gray-300 uppercase tracking-widest italic">{item.waktu}</div>
+                                            </div>
+                                        </div>
                                     </td>
-                                )}
-
-                                <td className="p-6 text-center">
-                                    <div className="flex justify-center items-center gap-4">
-                                        <button
-                                            onClick={() => navigate(`/berita/${item.id}`)}
-                                            className="text-brand-primary font-black text-[10px] uppercase hover:underline tracking-widest"
-                                        >
-                                            Baca
-                                        </button>
-                                        {isAdmin && (
-                                            <button
-                                                onClick={() => navigate(`/berita-kami/editor/${item.id}`)}
-                                                className="text-amber-600 font-black text-[10px] uppercase hover:underline tracking-widest"
-                                            >
-                                                Edit
-                                            </button>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan={isAdmin ? 4 : 3} className="p-20 text-center text-brand-gray-300 font-black uppercase text-[10px] tracking-widest italic">
-                                    Tidak ada konten ditemukan
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                    <td className="p-8">
+                                        <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-xl font-black text-[10px] uppercase w-fit mx-auto ${item.tipe === 'BERITA' ? 'bg-brand-blue-50 text-brand-primary' : 'bg-indigo-50 text-indigo-600'
+                                            }`}>
+                                            {item.tipe === 'BERITA' ? <Newspaper className="w-3.5 h-3.5" /> : <ImageIcon className="w-3.5 h-3.5" />}
+                                            {item.tipe}
+                                        </div>
+                                    </td>
+                                    <td className="p-8">
+                                        <div className="flex justify-center items-center gap-6">
+                                            <button onClick={() => navigate(`/berita/${item.id}`)} title="Lihat"><Eye className="w-5 h-5 text-brand-gray-200 hover:text-brand-primary transition-colors" /></button>
+                                            {isAdmin && (
+                                                <>
+                                                    <button onClick={() => navigate(`/berita-kami/editor/${item.id}`)} title="Edit"><Edit3 className="w-5 h-5 text-brand-gray-200 hover:text-amber-500 transition-colors" /></button>
+                                                    <button onClick={() => handleDelete(item.id)} title="Hapus"><Trash2 className="w-5 h-5 text-brand-gray-200 hover:text-red-500 transition-colors" /></button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
