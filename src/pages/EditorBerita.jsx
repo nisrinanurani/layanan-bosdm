@@ -53,7 +53,7 @@ export default function EditorBerita({ userRole }) {
         const updated = id ? saved.map(b => b.id === parseInt(id) ? post : b) : [post, ...saved];
         localStorage.setItem('data_berita_bosdm', JSON.stringify(updated));
         alert("Konten Berhasil Disimpan!");
-        navigate('/BeritaKami');
+        navigate('/berita-kami');
     };
 
     return (

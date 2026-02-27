@@ -35,7 +35,7 @@ export default function BeritaKami({ userRole }) {
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-primary mt-3">Layanan Biro Organisasi & SDM</p>
                 </div>
                 {isAdmin && (
-                    <button onClick={() => navigate('/BeritaKami/editor')} className="bg-brand-dark text-white px-8 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:bg-brand-primary transition-all shadow-xl shadow-brand-blue-100">
+                    <button onClick={() => navigate('/berita-kami/editor')} className="bg-brand-dark text-white px-8 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:bg-brand-primary transition-all shadow-xl shadow-brand-blue-100">
                         <Plus className="w-4 h-4" /> Unggah Konten Baru
                     </button>
                 )}
@@ -73,7 +73,7 @@ export default function BeritaKami({ userRole }) {
                                 <td className="p-6 text-center">
                                     <div className="flex justify-center gap-4">
                                         <button onClick={() => navigate(`/berita/${item.id}`)} className="font-black text-[10px] uppercase text-brand-primary hover:underline">Baca</button>
-                                        {isAdmin && <button onClick={() => navigate(`/BeritaKami/editor/${item.id}`)} className="font-black text-[10px] uppercase text-brand-blue-700 hover:underline">Edit</button>}
+                                        {isAdmin && <button onClick={() => navigate(`/berita-kami/editor/${item.id}`)} className="font-black text-[10px] uppercase text-brand-blue-700 hover:underline">Edit</button>}
                                     </div>
                                 </td>
                             </tr>

@@ -16,7 +16,7 @@ import EditorBerita from './pages/EditorBerita';
 
 function LandingPage({ onOpenLogin }) {
   return (
-    <div className="bg-bosdm-sky min-h-screen">
+    <div className="bg-brand-gray-50 min-h-screen">
       <NewsHero />
       <PublicStats />
       <BottomCTA onOpenLogin={onOpenLogin} onOpenRegister={onOpenLogin} />

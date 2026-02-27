@@ -30,7 +30,7 @@ export default function NewsDetail() {
             {/* NAVBAR KEMBALI */}
             <nav className="max-w-5xl mx-auto px-6 py-10">
                 <button
-                    onClick={() => navigate('/BeritaKami')}
+                    onClick={() => navigate('/berita-kami')}
                     className="flex items-center gap-2 text-brand-gray-400 hover:text-brand-primary font-black text-[10px] uppercase tracking-widest transition-all"
                 >
                     <ArrowLeft className="w-4 h-4" /> Kembali ke Pusat Konten

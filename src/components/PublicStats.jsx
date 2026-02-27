@@ -295,7 +295,7 @@ export default function PublicStats() {
                     variants={cardVariants}
                     initial="hidden"
                     animate={inView ? 'visible' : 'hidden'}
-                    className="rounded-2xl bg-bosdm-paper border border-bosdm-sky/40"
+                    className="rounded-2xl bg-white border border-brand-gray-100"
                     style={{
                         boxShadow: '0 4px 20px rgba(151, 210, 227, 0.39), 0 1px 3px rgba(0, 0, 0, 0.04)',
                     }}
@@ -325,7 +325,7 @@ export default function PublicStats() {
                                 {BASE_STATUS.map((d) => (
                                     <div
                                         key={d.name}
-                                        className="text-center p-3 rounded-xl bg-bosdm-sky border border-bosdm-navy/20"
+                                        className="text-center p-3 rounded-xl bg-brand-gray-50 border border-brand-gray-100"
                                     >
                                         <p className="text-2xl font-bold tracking-tight" style={{ color: d.color }}>
                                             {d.value.toLocaleString('id-ID')}
