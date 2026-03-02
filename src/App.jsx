@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 // Pastikan path asset benar sesuai folder project kamu
-import logoBrin from '../assets/logo-brin-white.png';
+import logoBrin from '../assets/logo-brin-decs.png';
 import logoBerakhlak from '../assets/logo-berakhlak.png';
 
 export default function NewsHero() {
