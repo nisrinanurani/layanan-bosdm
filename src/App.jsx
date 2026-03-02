@@ -13,6 +13,7 @@ import TanyaKami from './pages/TanyaKami';
 import SemuaLink from './pages/SemuaLink';
 import BeritaKami from './pages/BeritaKami';
 import EditorBerita from './pages/EditorBerita';
+import DokumenKami from './pages/DokumenKami';
 
 function LandingPage({ onOpenLogin }) {
   return (
@@ -101,6 +102,10 @@ function App() {
         <Route
           path="/semua-link"
           element={isLoggedIn ? <SemuaLink userRole={userRole} /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/dokumen-kami"
+          element={isLoggedIn ? <DokumenKami userRole={userRole} /> : <Navigate to="/" replace />}
         />
 
         {/* RUTE EDITOR (KHUSUS ADMIN/SUPERADMIN) */}
