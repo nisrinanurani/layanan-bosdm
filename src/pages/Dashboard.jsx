@@ -79,6 +79,7 @@ export default function Dashboard({ userRole, onLogout }) {
                                 if (item.id === 'tanya') navigate('/tanya');
                                 if (item.id === 'link') navigate('/semua-link');
                                 if (item.id === 'download') navigate('/dokumen-kami');
+                                if (item.id === 'grafik') navigate('/grafik-data');
                             }}
                             className="group relative cursor-pointer"
                         >
