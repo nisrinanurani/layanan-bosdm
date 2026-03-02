@@ -2,12 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Search, FileText, ExternalLink, Plus,
-    Trash2, X, FileType, ArrowLeft
+    Trash2, X, FileType, ArrowLeft,
+    ChevronDown, Filter
 } from 'lucide-react';
 
-// Asset Path (Samakan dengan NewsHero)
+// Asset Path
 import logoBrin from '../assets/logo-brin-decs.png';
-import logoBerakhlak from '../assets/logo-berakhlak.png';
 
 export default function DokumenKami({ userRole }) {
     const navigate = useNavigate();
@@ -19,7 +19,6 @@ export default function DokumenKami({ userRole }) {
 
     const isAdmin = userRole === 'admin' || userRole === 'superadmin';
 
-    // Load Data
     useEffect(() => {
         const savedDocs = JSON.parse(localStorage.getItem('data_dokumen_bosdm') || '[]');
         setDocuments(savedDocs);
@@ -55,184 +54,142 @@ export default function DokumenKami({ userRole }) {
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
 
-            {/* --- 1. NAVBAR IDENTITAS --- */}
-            <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-[60] shadow-sm">
-                <div className="max-w-[1600px] mx-auto grid grid-cols-3 items-center">
-                    <div className="flex justify-start">
-                        <img
-                            src={logoBrin} alt="BRIN"
-                            className="h-10 w-auto object-contain cursor-pointer"
-                            onClick={() => navigate('/')}
-                        />
-                    </div>
-                    <div className="flex flex-col items-center justify-center text-center">
-                        <h1 className="text-xs md:text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-tight">
-                            DASHBOARD BIRO ORGANISASI DAN <br className="hidden md:block" />
-                            SUMBER DAYA MANUSIA BRIN
-                        </h1>
-                    </div>
-                    <div className="flex justify-end">
-                        <img src={logoBerakhlak} alt="BerAKHLAK" className="h-8 w-auto object-contain" />
-                    </div>
+            {/* --- NAVBAR SEDERHANA --- */}
+            <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-[60]">
+                <div className="max-w-[1600px] mx-auto flex justify-between items-center">
+                    <img
+                        src={logoBrin} alt="BRIN"
+                        className="h-10 w-auto cursor-pointer"
+                        onClick={() => navigate('/')}
+                    />
+                    <h1 className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-900 hidden md:block">
+                        Dokumen & Arsip Digital BOSDM
+                    </h1>
+                    <div className="w-10 md:hidden"></div> {/* Spacer Mobile */}
                 </div>
             </nav>
 
-            {/* --- 2. KONTEN UTAMA --- */}
-            <main className="max-w-6xl mx-auto px-6 py-8">
+            <main className="max-w-[1600px] mx-auto px-6 py-12">
 
-                {/* TOMBOL KEMBALI KE DASHBOARD */}
-                <button
-                    onClick={() => navigate('/')}
-                    className="group flex items-center gap-2 mb-8 text-slate-400 hover:text-blue-600 transition-all"
-                >
-                    <div className="p-2 rounded-full group-hover:bg-blue-50 transition-all">
-                        <ArrowLeft className="w-5 h-5" />
-                    </div>
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em]">Kembali ke Dashboard</span>
-                </button>
+                {/* --- HEADER CONTROLS --- */}
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-12">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="group flex items-center gap-4 bg-white px-8 py-4 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border-4 border-white hover:bg-blue-600 hover:text-white transition-all active:scale-95"
+                    >
+                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">Kembali</span>
+                    </button>
 
-                {/* HEADER HALAMAN */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                    <div className="flex items-center gap-5">
-                        <div className="p-4 bg-slate-900 rounded-3xl shadow-xl">
-                            <FileText className="w-10 h-10 text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-4xl font-black uppercase tracking-tighter leading-none">Dokumen Kami</h2>
-                            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Pusat Tautan & Arsip Digital</p>
-                        </div>
-                    </div>
-
-                    {/* SEARCH & ADD ACTION */}
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
+                        {/* Search */}
+                        <div className="relative group w-full md:w-80 text-slate-900">
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                             <input
-                                type="text" placeholder="Cari judul..."
-                                className="pl-12 pr-6 py-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold w-full md:w-72 focus:border-blue-500 outline-none transition-all shadow-sm"
+                                type="text" placeholder="Cari Judul..."
+                                className="w-full pl-14 pr-8 py-5 bg-white border-4 border-white rounded-[2.5rem] text-sm font-black uppercase shadow-xl shadow-slate-200/50 outline-none focus:ring-4 focus:ring-blue-100 transition-all"
                                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        {isAdmin && (
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="p-4 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200 hover:bg-slate-900 transition-all active:scale-95"
+
+                        {/* Filter Dropdown */}
+                        <div className="relative w-full md:w-64 group text-slate-900">
+                            <Filter className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 pointer-events-none z-10" />
+                            <select
+                                value={filterCategory}
+                                onChange={(e) => setFilterCategory(e.target.value)}
+                                className="w-full pl-14 pr-12 py-5 bg-white border-4 border-white rounded-[2.5rem] text-[11px] font-black uppercase tracking-widest shadow-xl shadow-slate-200/50 outline-none appearance-none cursor-pointer focus:ring-4 focus:ring-blue-100 transition-all"
                             >
-                                <Plus className="w-6 h-6" />
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat === "Semua" ? "Semua Kategori" : cat}</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        </div>
+
+                        {isAdmin && (
+                            <button onClick={() => setIsModalOpen(true)} className="w-full md:w-auto p-5 bg-blue-600 text-white rounded-[2.5rem] shadow-xl border-4 border-white hover:bg-slate-900 transition-all">
+                                <Plus className="w-6 h-6 mx-auto" />
                             </button>
                         )}
                     </div>
                 </div>
 
-                {/* FILTER CATEGORY PILLS */}
-                <div className="flex flex-wrap gap-3 mb-10">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat} onClick={() => setFilterCategory(cat)}
-                            className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${filterCategory === cat
-                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-100'
-                                    : 'bg-white text-slate-400 border border-slate-100 hover:border-blue-200'
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
-
-                {/* TABEL DOKUMEN (STYLE LINKTREE) */}
-                <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border-4 border-white overflow-hidden mb-20">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-8 py-6 text-center w-24">No.</th>
-                                <th className="px-6 py-6">Judul Dokumen</th>
-                                <th className="px-6 py-6">Kategori</th>
-                                <th className="px-8 py-6 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {filteredDocs.length > 0 ? filteredDocs.map((doc, index) => (
-                                <tr key={doc.id} className="group hover:bg-blue-50/50 transition-all">
-                                    <td className="px-8 py-8 text-center text-sm font-black text-slate-200">{index + 1}</td>
-                                    <td className="px-6 py-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-white transition-colors shadow-sm">
-                                                <FileType className="w-6 h-6 text-slate-400 group-hover:text-blue-600" />
+                {/* --- TABEL --- */}
+                <div className="bg-white rounded-[4rem] shadow-2xl shadow-slate-200/60 border-4 border-white overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-slate-50 text-[11px] font-black uppercase tracking-[0.25em] text-slate-300">
+                                    <th className="px-12 py-10 text-center w-28">No.</th>
+                                    <th className="px-8 py-10 italic">Judul Dokumen</th>
+                                    <th className="px-10 py-10 text-center">Kategori</th>
+                                    <th className="px-12 py-10 text-right w-48">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {filteredDocs.length > 0 ? filteredDocs.map((doc, index) => (
+                                    <tr key={doc.id} className="group hover:bg-blue-50/50 transition-all">
+                                        <td className="px-12 py-10 text-center text-sm font-black text-slate-200">{index + 1}</td>
+                                        <td className="px-8 py-10">
+                                            <div className="flex items-center gap-6">
+                                                <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-white transition-all shadow-sm">
+                                                    <FileType className="w-7 h-7 text-slate-400 group-hover:text-blue-600" />
+                                                </div>
+                                                <p className="text-[13px] font-black text-slate-800 uppercase tracking-tight">{doc.judul}</p>
                                             </div>
-                                            <span className="text-[13px] font-black text-slate-800 uppercase tracking-tight leading-tight">{doc.judul}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-8">
-                                        <span className="px-4 py-1.5 bg-blue-50 text-blue-700 text-[9px] font-black uppercase tracking-widest rounded-lg border border-blue-100">
-                                            {doc.kategori}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-8">
-                                        <div className="flex items-center justify-end gap-3">
-                                            <a
-                                                href={doc.link} target="_blank" rel="noreferrer"
-                                                className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all shadow-lg active:scale-95"
-                                            >
-                                                Buka <ExternalLink className="w-4 h-4" />
-                                            </a>
-                                            {isAdmin && (
-                                                <button
-                                                    onClick={() => handleDelete(doc.id)}
-                                                    className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                                                >
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan="4" className="py-32 text-center opacity-20 font-black uppercase tracking-[0.5em] text-sm italic">
-                                        Data Dokumen Kosong
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td className="px-10 py-10 text-center">
+                                            <span className="px-6 py-2 bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-xl border border-slate-100 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all">
+                                                {doc.kategori}
+                                            </span>
+                                        </td>
+                                        <td className="px-12 py-10">
+                                            <div className="flex items-center justify-end gap-3">
+                                                <a href={doc.link} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-[1.5rem] hover:bg-blue-600 transition-all shadow-lg active:scale-95">
+                                                    Buka
+                                                </a>
+                                                {isAdmin && (
+                                                    <button onClick={() => handleDelete(doc.id)} className="p-4 bg-red-50 text-red-500 rounded-[1.5rem] hover:bg-red-500 hover:text-white transition-all shadow-sm border-4 border-white">
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan="4" className="py-48 text-center opacity-10 font-black uppercase tracking-[1em] text-xs italic text-slate-900">Data Kosong</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </main>
 
-            {/* MODAL INPUT (ADMIN ONLY) */}
+            {/* --- MODAL INPUT --- */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                     <div className="absolute inset-0 bg-slate-900/95" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl border-4 border-white">
-                        <h2 className="text-2xl font-black uppercase tracking-tighter mb-8 text-slate-900">Input Dokumen</h2>
+                    <div className="relative bg-white w-full max-w-md rounded-[3.5rem] p-12 shadow-2xl border-4 border-white">
+                        <h2 className="text-3xl font-black uppercase tracking-tighter mb-10 text-slate-900">Input Data</h2>
                         <form onSubmit={handleAddDocument} className="space-y-6">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Judul Dokumen</label>
-                                <input
-                                    required type="text" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl mt-2 text-sm font-bold focus:border-blue-500 outline-none"
-                                    placeholder="Contoh: SOP Cuti Tahunan"
-                                    value={newDoc.judul} onChange={(e) => setNewDoc({ ...newDoc, judul: e.target.value })}
-                                />
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Judul</label>
+                                <input required type="text" className="w-full p-6 bg-slate-50 border-4 border-slate-50 rounded-[1.8rem] mt-2 text-sm font-bold outline-none focus:border-blue-500 transition-all" value={newDoc.judul} onChange={(e) => setNewDoc({ ...newDoc, judul: e.target.value })} />
                             </div>
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Kategori</label>
-                                <select
-                                    className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl mt-2 text-sm font-bold outline-none"
-                                    value={newDoc.kategori} onChange={(e) => setNewDoc({ ...newDoc, kategori: e.target.value })}
-                                >
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Kategori</label>
+                                <select className="w-full p-6 bg-slate-50 border-4 border-slate-50 rounded-[1.8rem] mt-2 text-sm font-bold outline-none cursor-pointer focus:border-blue-500 text-slate-900" value={newDoc.kategori} onChange={(e) => setNewDoc({ ...newDoc, kategori: e.target.value })} >
                                     {categories.filter(c => c !== "Semua").map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Link Dokumen (URL)</label>
-                                <input
-                                    required type="url" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl mt-2 text-sm font-bold focus:border-blue-500 outline-none"
-                                    placeholder="https://google-drive.com/..."
-                                    value={newDoc.link} onChange={(e) => setNewDoc({ ...newDoc, link: e.target.value })}
-                                />
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">URL Dokumen</label>
+                                <input required type="url" className="w-full p-6 bg-slate-50 border-4 border-slate-50 rounded-[1.8rem] mt-2 text-sm font-bold outline-none focus:border-blue-500" value={newDoc.link} onChange={(e) => setNewDoc({ ...newDoc, link: e.target.value })} />
                             </div>
-                            <button type="submit" className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs mt-4 shadow-xl hover:bg-slate-900 transition-all">
-                                Simpan ke Arsip
-                            </button>
+                            <button type="submit" className="w-full py-6 bg-blue-600 text-white rounded-[1.8rem] font-black uppercase tracking-widest text-[11px] mt-6 shadow-xl hover:bg-slate-900 transition-all">Simpan</button>
                         </form>
                     </div>
                 </div>
