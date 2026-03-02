@@ -54,18 +54,18 @@ export default function DokumenKami({ userRole }) {
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
 
-            {/* --- NAVBAR SEDERHANA --- */}
-            <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-[60]">
-                <div className="max-w-[1600px] mx-auto flex justify-between items-center">
-                    <img
-                        src={logoBrin} alt="BRIN"
-                        className="h-10 w-auto cursor-pointer"
+            {/* 1. NAVBAR */}
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+                        <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+                    </div>
+                    <button
                         onClick={() => navigate('/')}
-                    />
-                    <h1 className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-900 hidden md:block">
-                        Dokumen & Arsip Digital BOSDM
-                    </h1>
-                    <div className="w-10 md:hidden"></div> {/* Spacer Mobile */}
+                        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" /> Kembali
+                    </button>
                 </div>
             </nav>
 
