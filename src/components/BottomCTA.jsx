@@ -69,8 +69,8 @@ export default function BottomCTA({ onOpenLogin, onOpenRegister }) {
                     className="bg-white rounded-3xl p-10 md:p-14 shadow-2xl shadow-blue-900/50 mx-auto max-w-4xl relative overflow-hidden"
                 >
                     {/* Dekorasi Background Card (Tipis) */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50 pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full translate-y-1/2 translate-x-1/2 opacity-100 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-50 rounded-full translate-y-1/2 -translate-x-1/2 opacity-100 pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
 
