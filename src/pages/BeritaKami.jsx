@@ -5,6 +5,7 @@ import {
     Newspaper, Image as ImageIcon, ArrowLeft,
     Edit3, Trash2, Eye, LayoutGrid, AlertCircle
 } from 'lucide-react';
+import logoBrin from '../assets/logo-brin-decs.png';
 
 export default function BeritaKami({ userRole }) {
     const navigate = useNavigate();
@@ -47,6 +48,7 @@ export default function BeritaKami({ userRole }) {
     return (
         <div className="min-h-screen bg-slate-50 p-8 font-sans">
             <div className="max-w-7xl mx-auto">
+
                 {/* NAVBAR */}
                 <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
                     <div className="max-w-7xl mx-auto flex items-center justify-between">
