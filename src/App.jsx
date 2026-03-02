@@ -14,6 +14,8 @@ import SemuaLink from './pages/SemuaLink';
 import BeritaKami from './pages/BeritaKami';
 import EditorBerita from './pages/EditorBerita';
 import DokumenKami from './pages/DokumenKami';
+import GrafikData from './pages/GrafikData';
+
 
 function LandingPage({ onOpenLogin }) {
   return (
@@ -107,7 +109,10 @@ function App() {
           path="/dokumen-kami"
           element={isLoggedIn ? <DokumenKami userRole={userRole} /> : <Navigate to="/" replace />}
         />
-
+        <Route
+          path="/grafik-data"
+          element={isLoggedIn ? <GrafikData userRole={userRole} /> : <Navigate to="/" replace />}
+        />
         {/* RUTE EDITOR (KHUSUS ADMIN/SUPERADMIN) */}
         <Route
           path="/berita-kami/editor"
