@@ -127,14 +127,13 @@ export default function BeritaKami({ userRole }) {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <div className="flex items-center bg-white border border-brand-gray-200 rounded-[1.5rem] shadow-sm overflow-hidden">
-                            <div className="flex items-center gap-2 bg-white p-1 border border-slate-200 rounded-lg shadow-sm">
-                                <input type="date" className="px-3 py-1.5 text-xs text-slate-600 outline-none" onChange={(e) => setSelectedDate(e.target.value)} />
-                            </div>
-                            <div className="px-6 py-4 flex items-center gap-8 min-w-[180px] cursor-pointer hover:bg-brand-gray-50 transition-colors">
-                                <span className="text-brand-gray-400 text-sm font-medium">{filterTipe}</span>
-                                <ChevronDown className="w-5 h-5 text-brand-gray-300" />
-                            </div>
+                        <div className="flex items-center gap-2 bg-white p-1 border border-slate-200 rounded-lg shadow-sm">
+                            <input type="date" className="px-3 py-1.5 text-xs text-slate-600 outline-none" onChange={(e) => setSelectedDate(e.target.value)} />
+                            <div className="w-px h-4 bg-slate-200"></div>
+                            <select className="px-3 py-1.5 text-xs text-slate-600 bg-transparent outline-none cursor-pointer" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                                <option value="Semua">Semua Kategori</option>
+                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
                         </div>
                     </div>
                     {isAdmin && (
