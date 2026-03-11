@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import {
     ChevronDown, Edit3, Save, X, Plus, ArrowLeft, Trash2,
@@ -128,13 +128,13 @@ export default function ProfilBiro({ userRole }) {
     return (
         <div className="min-h-screen bg-brand-gray-50 font-sans text-brand-dark pb-20">
             {/* NAVBAR */}
-            <nav className="border-b border-brand-gray-200 px-6 py-4 sticky top-0 z-50 bg-white/80 backdrop-blur-md">
-                <div className="max-w-5xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/Dashboard')}>
-                        <img src={logoBrin} alt="Logo BRIN" className="h-10 w-auto object-contain" />
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/Dashboard')}>
+                        <img src={logoBrin} alt="Logo BRIN" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                     </div>
-                    <button onClick={() => navigate('/Dashboard')} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand-gray-400 hover:text-brand-primary transition-all">
-                        <ArrowLeft className="w-4 h-4" /> Kembali ke Dashboard
+                    <button onClick={() => navigate('/Dashboard')} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
+                        <ArrowLeft className="w-4 h-4" /> Kembali
                     </button>
                 </div>
             </nav>

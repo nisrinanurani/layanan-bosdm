@@ -11,6 +11,7 @@ import {
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import logoBrin from '../assets/logo-brin-decs.png';
 
 /* ── Configuration & Palettes ────────────────────────── */
 const PALETTES = {
@@ -82,15 +83,25 @@ export default function GrafikData({ userRole }) {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans">
+
+            {/* NAVBAR */}
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate(-1)}>
+                        <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+                    </div>
+                    <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
+                        <ArrowLeft className="w-4 h-4" /> Kembali
+                    </button>
+                </div>
+            </nav>
+
+            <div className="max-w-7xl mx-auto p-6 lg:p-10">
 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
                     <div>
-                        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-blue-600 font-bold text-sm mb-2 transition-all">
-                            <ArrowLeft size={16} /> DASHBOARD
-                        </button>
                         <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Pengelola Visualisasi</h1>
                     </div>
                     <button
