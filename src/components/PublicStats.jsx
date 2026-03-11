@@ -1,10 +1,11 @@
-﻿import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import {
     PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
-import { Users, TrendingUp, GraduationCap } from 'lucide-react';
+import { Users, TrendingUp, GraduationCap, BarChart2 } from 'lucide-react';
+import { ChartRenderer, PALETTES } from '../lib/chartUtils';
 
 // Background Image
 import gedungBrin from '../assets/gedung-brin-thamrin.png';
@@ -480,8 +481,68 @@ export default function PublicStats() {
                         </div>
 
                     </div>
+
+                        {/* ─── Kolom dinamis: Published Admin Charts ─── */}
+                        <DynamicChartsSection />
+
                 </motion.div>
             </div>
         </section>
+    );
+}
+
+/* ── Dynamic Charts: reads published charts from localStorage ── */
+function DynamicChartsSection() {
+    const [charts, setCharts] = useState([]);
+
+    useEffect(() => {
+        const load = () => {
+            try {
+                const raw = localStorage.getItem('bosdm_dynamic_charts');
+                const all = raw ? JSON.parse(raw) : [];
+                setCharts(all.filter(c => c.published));
+            } catch { setCharts([]); }
+        };
+        load();
+        // Re-sync when other tabs update localStorage
+        window.addEventListener('storage', load);
+        return () => window.removeEventListener('storage', load);
+    }, []);
+
+    if (!charts.length) return null;
+
+    return (
+        <div className="col-span-full border-t border-slate-100 px-6 md:px-8 py-8">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                    <BarChart2 className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                    <p className="text-base font-bold text-slate-900 tracking-tight">Visualisasi Data</p>
+                    <p className="text-xs text-slate-400 font-medium">{charts.length} grafik dipublikasi</p>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {charts.map((chart, idx) => (
+                    <motion.div
+                        key={chart.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.08, type: 'spring', stiffness: 80 }}
+                        className="bg-slate-50 rounded-2xl border border-slate-100 p-5"
+                    >
+                        {/* palette strip */}
+                        <div className="flex gap-1 mb-3">
+                            {(PALETTES[chart.palette] || []).slice(0, 5).map((c, i) => (
+                                <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
+                            ))}
+                        </div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{chart.type} chart</p>
+                        <h4 className="font-black text-sm text-slate-800 mb-4 truncate">{chart.title}</h4>
+                        <ChartRenderer chart={chart} height={180} />
+                    </motion.div>
+                ))}
+            </div>
+        </div>
     );
 }

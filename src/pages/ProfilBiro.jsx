@@ -112,6 +112,48 @@ const ImageUploader = ({ currentSrc, onUpload, label, shape = 'rect' }) => {
 };
 
 // ===========================
+// KOMPONEN: TusiItem (inline edit untuk satu baris tugas)
+// ===========================
+const TusiItem = ({ value, onSave, onDelete }) => {
+    const [editing, setEditing] = useState(false);
+    const [temp, setTemp] = useState(value);
+    useEffect(() => setTemp(value), [value]);
+
+    if (editing) {
+        return (
+            <div className="flex items-center gap-2">
+                <input
+                    autoFocus
+                    value={temp}
+                    onChange={e => setTemp(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { onSave(temp); setEditing(false); } if (e.key === 'Escape') { setTemp(value); setEditing(false); } }}
+                    className="flex-1 p-2 text-sm font-bold border-2 border-brand-blue-200 rounded-xl outline-none focus:border-brand-primary bg-brand-blue-50/30"
+                />
+                <button onClick={() => { onSave(temp); setEditing(false); }} className="px-3 py-1.5 bg-brand-primary text-white text-xs font-black rounded-xl hover:bg-brand-blue-800 transition-all flex items-center gap-1">
+                    <Save className="w-3 h-3" /> Simpan
+                </button>
+                <button onClick={() => { setTemp(value); setEditing(false); }} className="px-3 py-1.5 bg-brand-gray-100 text-brand-gray-400 text-xs font-bold rounded-xl hover:bg-brand-gray-200 transition-all">
+                    Batal
+                </button>
+            </div>
+        );
+    }
+    return (
+        <div className="flex items-center justify-between gap-2 group/tusi-item">
+            <span className="text-sm font-bold text-brand-gray-600 flex-1">{value}</span>
+            <div className="flex items-center gap-1 opacity-0 group-hover/tusi-item:opacity-100 transition-opacity shrink-0">
+                <button onClick={() => setEditing(true)} className="p-1.5 text-brand-gray-300 hover:text-brand-primary hover:bg-brand-blue-50 rounded-lg transition-all">
+                    <Edit3 className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={onDelete} className="p-1.5 text-brand-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                    <X className="w-3.5 h-3.5" />
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// ===========================
 // KOMPONEN UTAMA
 // ===========================
 export default function ProfilBiro({ userRole }) {
