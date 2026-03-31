@@ -1,11 +1,10 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Components
-import NewsHero from './components/NewsHero';
-import PublicStats from './components/PublicStats';
-import BottomCTA from './components/BottomCTA';
+import LandingPage from './components/LandingPage';
 import LoginModal from './components/LoginModal';
+import RegisterModal from './components/RegisterModal';
 import NewsDetail from './pages/NewsDetail';
 import Dashboard from './pages/Dashboard';
 import ProfilBiro from './pages/ProfilBiro';
@@ -17,22 +16,11 @@ import DokumenKami from './pages/DokumenKami';
 import GrafikData from './pages/GrafikData';
 
 
-function LandingPage({ onOpenLogin }) {
-  return (
-    <div className="bg-brand-gray-50 min-h-screen">
-      {/* NewsHero sekarang mandiri, Navbar resmi ada di dalamnya */}
-      <NewsHero />
-      <PublicStats />
-      <BottomCTA onOpenLogin={onOpenLogin} />
-      <footer className="bg-brand-dark text-brand-gray-400 text-center py-8 text-[10px] font-black uppercase tracking-[0.2em] border-t border-white/5">
-        &copy; {new Date().getFullYear()} Biro Organisasi dan SDM - BRIN
-      </footer>
-    </div>
-  );
-}
+
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   // Persistence: Cek status login dari memori browser
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -47,7 +35,8 @@ function App() {
     localStorage.setItem('userRole', userRole);
   }, [isLoggedIn, userRole]);
 
-  const handleLoginSuccess = (role) => {
+  const handleLoginSuccess = (userData) => {
+    const role = userData.is_superadmin ? 'superadmin' : 'pegawai';
     setUserRole(role);
     setIsLoggedIn(true);
     setIsLoginOpen(false);
@@ -69,7 +58,10 @@ function App() {
           path="/"
           element={
             !isLoggedIn ? (
-              <LandingPage onOpenLogin={() => setIsLoginOpen(true)} />
+              <LandingPage
+                onOpenLogin={() => setIsLoginOpen(true)}
+                onOpenRegister={() => setIsRegisterOpen(true)}
+              />
             ) : (
               <Navigate to="/dashboard" replace />
             )
@@ -143,6 +135,11 @@ function App() {
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+        onSwitchToLogin={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }}
       />
     </Router>
   );
