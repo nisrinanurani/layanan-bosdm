@@ -84,28 +84,43 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         {/* === POP-UP BERHASIL (SUCCESS VIEW) === */}
                         {generatedUsername && (
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 className="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-12 text-center"
                             >
                                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-3xl flex items-center justify-center mb-6 shadow-sm">
                                     <CheckCircle2 className="w-12 h-12" />
                                 </div>
-                                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Registrasi Berhasil</h2>
-                                <p className="text-slate-500 text-sm mt-2">Simpan username ini untuk masuk ke dashboard:</p>
 
-                                <div className="mt-8 p-6 bg-blue-50 border-2 border-dashed border-blue-200 rounded-[2rem] w-full flex items-center justify-between group">
-                                    <span className="font-mono text-2xl font-black text-blue-600 uppercase tracking-widest">{generatedUsername}</span>
-                                    <button onClick={copyUsername} className="p-3 bg-white shadow-md rounded-xl hover:bg-blue-600 hover:text-white transition-all">
-                                        <Copy className="w-5 h-5" />
+                                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Pendaftaran Berhasil</h2>
+                                <p className="text-slate-500 text-sm mt-2">Gunakan username unik ini untuk login ke portal:</p>
+
+                                {/* Box Username dengan Tombol Salin */}
+                                <div className="mt-8 p-2 bg-blue-50 border-2 border-dashed border-blue-200 rounded-[2rem] w-full flex items-center justify-between group overflow-hidden">
+                                    <span className="flex-1 font-mono text-2xl font-black text-blue-600 uppercase tracking-widest pl-6 text-left">
+                                        {generatedUsername}
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(generatedUsername);
+                                            alert("Username berhasil disalin!");
+                                        }}
+                                        className="flex items-center gap-2 px-6 py-4 bg-white shadow-md rounded-2xl text-blue-600 font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all active:scale-95"
+                                    >
+                                        <Copy className="w-4 h-4" />
+                                        Salin
                                     </button>
                                 </div>
 
+                                <p className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                    *Username ini dibuat otomatis oleh sistem
+                                </p>
+
                                 <button
                                     onClick={() => { onClose(); onSwitchToLogin(); }}
-                                    className="w-full mt-10 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-[0.3em] hover:bg-black transition-all shadow-xl shadow-slate-200"
+                                    className="w-full mt-10 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-[0.3em] hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3"
                                 >
-                                    Lanjut ke Login Portal
+                                    Lanjut ke Login <ArrowRight className="w-4 h-4" />
                                 </button>
                             </motion.div>
                         )}
