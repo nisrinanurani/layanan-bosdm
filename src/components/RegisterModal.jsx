@@ -1,4 +1,4 @@
-﻿import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Lock, IdCard, Building2, LayoutGrid, ArrowRight, CheckCircle2, Copy, Send, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -66,7 +66,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         try {
             const res = await fetch('https://layanan-bosdm.free.nf/api/register_final.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 body: JSON.stringify(formData)
             });
             const data = await res.json();
