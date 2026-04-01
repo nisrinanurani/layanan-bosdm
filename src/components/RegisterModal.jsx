@@ -64,11 +64,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         if (formData.password !== formData.confirmPassword) return alert("Password tidak cocok!");
         setLoading(true);
         try {
-            const res = await fetch('https://layanan-bosdm.free.nf/api/register_final.php', {
+            const res = await fetch('/api/register_final.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify(formData)
             });
