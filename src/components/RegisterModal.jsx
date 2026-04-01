@@ -64,7 +64,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         if (formData.password !== formData.confirmPassword) return alert("Password tidak cocok!");
         setLoading(true);
         try {
-            const res = await fetch('/api/register_final.php', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE}/api/register_final.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

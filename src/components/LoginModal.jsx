@@ -21,7 +21,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
         try {
             // Fetch ke API login di InfinityFree
-            const response = await fetch('/api/login.php', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/login.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
