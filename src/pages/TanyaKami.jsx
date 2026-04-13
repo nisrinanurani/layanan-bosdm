@@ -8,12 +8,15 @@ import ForumList from './ForumList';
 import ForumDetail from './ForumDetail';
 import LaporKak from './LaporKak';
 
-export default function TanyaKami({ userRole }) {
+// Menerima props 'user' (objek dari DB) dan 'permissions' (RBAC)
+export default function TanyaKami({ user, permissions }) {
     const navigate = useNavigate();
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
 
-    const [activeModule, setActiveModule] = useState('forum'); // 'forum' | 'lapor'
-    const [selectedThread, setSelectedThread] = useState(null); // for Forum navigation
+    // Gunakan permissions RBAC
+    const isAdmin = !!(permissions?.tanya?.edit || permissions?.tanya?.delete);
+
+    const [activeModule, setActiveModule] = useState('forum');
+    const [selectedThread, setSelectedThread] = useState(null);
 
     const handleSelectThread = (thread) => setSelectedThread(thread);
     const handleBackFromThread = () => setSelectedThread(null);
@@ -24,16 +27,14 @@ export default function TanyaKami({ userRole }) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans">
+        <div className="min-h-screen bg-slate-50 font-sans text-left">
             {/* ===== TOP NAVBAR ===== */}
             <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-                    {/* Brand / Logo */}
                     <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                     </div>
 
-                    {/* Floating Pill Navigation */}
                     <div className="flex bg-slate-100 p-1 rounded-2xl gap-1 shadow-inner">
                         <button
                             onClick={() => handleModuleSwitch('forum')}
@@ -57,7 +58,6 @@ export default function TanyaKami({ userRole }) {
                         </button>
                     </div>
 
-                    {/* Right side: Kembali + indicator */}
                     <div className="flex items-center gap-4">
                         <div className="hidden sm:flex items-center gap-2">
                             <div className={`w-2.5 h-2.5 rounded-full ${activeModule === 'forum' ? 'bg-blue-500' : 'bg-red-500'} animate-pulse`} />
@@ -74,10 +74,9 @@ export default function TanyaKami({ userRole }) {
                     </div>
                 </div>
 
-                {/* Active module accent bar */}
                 <motion.div
                     layoutId="module-accent"
-                    className={`h-0.5 ${activeModule === 'forum' ? 'bg-blue-600' : 'bg-red-600'}`}
+                    className={`h-0.5 mt-2 ${activeModule === 'forum' ? 'bg-blue-600' : 'bg-red-600'}`}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
             </nav>
@@ -102,10 +101,11 @@ export default function TanyaKami({ userRole }) {
                                         exit={{ opacity: 0, x: 30 }}
                                         transition={{ duration: 0.2 }}
                                     >
+                                        {/* Kirim OBJEK 'user' utuh agar Detail bisa tahu siapa yang komen */}
                                         <ForumDetail
                                             thread={selectedThread}
                                             onBack={handleBackFromThread}
-                                            userRole={userRole}
+                                            user={user}
                                         />
                                     </motion.div>
                                 ) : (
@@ -116,9 +116,10 @@ export default function TanyaKami({ userRole }) {
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.2 }}
                                     >
+                                        {/* Kirim OBJEK 'user' utuh agar List bisa kirim ID saat buat thread */}
                                         <ForumList
                                             onSelectThread={handleSelectThread}
-                                            userRole={userRole}
+                                            user={user}
                                         />
                                     </motion.div>
                                 )}
@@ -132,8 +133,8 @@ export default function TanyaKami({ userRole }) {
                             exit={{ opacity: 0, x: 30 }}
                             transition={{ duration: 0.2 }}
                         >
-                            {/* Semua role menggunakan LaporKak — admin dan pegawai */}
-                            <LaporKak userRole={userRole} />
+                            {/* Kirim OBJEK 'user' utuh ke LaporKak agar ID pelapor tercatat di SQL */}
+                            <LaporKak user={user} />
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, Loader2, LogIn, Lock, User as UserIcon } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
         try {
             // Fetch ke API login di InfinityFree
-            const response = await fetch(`${import.meta.env.VITE_API_BASE}/api/login.php`, {
+            const response = await fetch('https://layanan-bosdm.free.nf/api/login.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

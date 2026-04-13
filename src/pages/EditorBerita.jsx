@@ -1,13 +1,13 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { ArrowLeft, Image as ImageIcon, FileText, CheckCircle } from 'lucide-react';
 
-export default function EditorBerita({ userRole }) {
+export default function EditorBerita({ permissions }) {
     const { id } = useParams();
     const navigate = useNavigate();
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
+    const isAdmin = !!(permissions?.berita?.edit);
 
     const [post, setPost] = useState({
         id: id ? parseInt(id) : Date.now(),

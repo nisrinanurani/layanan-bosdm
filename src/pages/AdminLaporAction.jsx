@@ -208,8 +208,9 @@ function ActionPanel({ report, onSave, onClose }) {
     );
 }
 
-export default function AdminLaporAction({ userRole }) {
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
+export default function AdminLaporAction({ permissions }) {
+    const isAdmin = !!(permissions?.lapor?.view);
+    const canEdit = !!(permissions?.lapor?.edit);
     const [reports, setReports] = useState(() => {
         try {
             const saved = localStorage.getItem('lapor_kak_data');

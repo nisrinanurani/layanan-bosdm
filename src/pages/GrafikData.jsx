@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -104,7 +104,6 @@ function ExcelUploadZone({ onData, rowCount }) {
 
     return (
         <div className="space-y-3">
-            {/* Download Template */}
             <button type="button" onClick={downloadTemplate}
                 className="w-full flex items-center gap-3 px-5 py-3.5 bg-emerald-50 border-2 border-emerald-200 rounded-2xl hover:bg-emerald-100 hover:border-emerald-400 transition-all group">
                 <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -116,15 +115,13 @@ function ExcelUploadZone({ onData, rowCount }) {
                 </div>
             </button>
 
-            {/* Helper */}
             <div className="flex items-start gap-2 px-3 py-2 bg-blue-50 rounded-xl border border-blue-100">
-                <Info className="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" />
+                <div className="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0"><Info size={14} /></div>
                 <p className="text-[10px] text-blue-600 leading-relaxed">
-                    Gunakan template ini <strong>tanpa mengubah nama header</strong>. Kolom A = <code className="bg-blue-100 px-1 rounded">Label</code>, Kolom B = <code className="bg-blue-100 px-1 rounded">Nilai</code>.
+                    Gunalan template ini <strong>tanpa mengubah nama header</strong>. Kolom A = <code className="bg-blue-100 px-1 rounded">Label</code>, Kolom B = <code className="bg-blue-100 px-1 rounded">Nilai</code>.
                 </p>
             </div>
 
-            {/* Upload */}
             <div className="grid grid-cols-2 gap-3">
                 <label className={`flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-2xl cursor-pointer transition-all group ${err ? 'border-red-300 bg-red-50' : ok ? 'border-emerald-300 bg-emerald-50' : 'border-blue-100 hover:bg-blue-50 hover:border-blue-400'}`}>
                     <FileSpreadsheet className={`w-5 h-5 ${err ? 'text-red-400' : ok ? 'text-emerald-500' : 'text-blue-500'}`} />
@@ -160,14 +157,12 @@ function ExcelUploadZone({ onData, rowCount }) {
 /* ─── Delete confirmation modal ───────────────────────── */
 function DeleteModal({ chart, onCancel, onConfirm }) {
     const [captcha, setCaptcha] = useState('');
-    const [step, setStep] = useState(1); // 1 = first warn, 2 = type name
+    const [step, setStep] = useState(1);
     const match = captcha.trim() === chart.title.trim();
     return (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={onCancel} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-                className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 overflow-hidden">
+                className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 overflow-hidden text-left">
                 <div className="flex items-center gap-3 mb-5">
                     <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shrink-0">
                         <Trash2 className="w-6 h-6 text-red-600" />
@@ -206,12 +201,12 @@ function DeleteModal({ chart, onCancel, onConfirm }) {
                         <input
                             type="text" value={captcha} onChange={e => setCaptcha(e.target.value)}
                             placeholder="Ketik judul di atas..."
-                            className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl outline-none focus:border-red-400 focus:ring-4 focus:ring-red-50 transition-all text-sm font-medium mb-5"
+                            className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-2xl outline-none focus:border-red-400 transition-all text-sm font-medium mb-5"
                         />
                         <div className="flex gap-3">
                             <button onClick={onCancel} className="flex-1 py-3 font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition-colors text-sm">Batal</button>
                             <button onClick={() => match && onConfirm()} disabled={!match}
-                                className="flex-1 py-3 bg-red-600 text-white font-black rounded-2xl transition-all text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-red-700 shadow-lg shadow-red-100">
+                                className="flex-1 py-3 bg-red-600 text-white font-black rounded-2xl transition-all text-sm disabled:opacity-30 hover:bg-red-700 shadow-lg shadow-red-100">
                                 <Trash2 className="inline w-4 h-4 mr-1" />Hapus Permanen
                             </button>
                         </div>
@@ -223,71 +218,110 @@ function DeleteModal({ chart, onCancel, onConfirm }) {
 }
 
 /* ════════════════════════════════════════════════════════
-   MAIN COMPONENT
+    MAIN COMPONENT
    ════════════════════════════════════════════════════════ */
-export default function GrafikData({ userRole }) {
+export default function GrafikData({ permissions }) {
     const navigate = useNavigate();
-    const isAdmin = userRole === 'superadmin';
+
+    const canEdit    = !!(permissions?.grafik?.edit);
+    const canDelete  = !!(permissions?.grafik?.delete);
+    const canPublish = !!(permissions?.grafik?.publish);
+    const isAdmin    = canEdit || canDelete || canPublish;
 
     const [allCharts, setAllCharts] = useState([]);
     const [isAddOpen, setIsAddOpen] = useState(false);
-    const [editModal, setEditModal] = useState(null);   // chart being edited
+    const [editModal, setEditModal] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [cardStatus, setCardStatus] = useState({});
-
-    // New chart form
     const [draft, setDraft] = useState({ title: '', type: 'bar', palette: 'ocean', data: [] });
+    const [loading, setLoading] = useState(true);
+    const [apiError, setApiError] = useState(null);
 
+    // Fetch dari MySQL
     useEffect(() => {
-        if (!isAdmin) { navigate('/'); return; }
-        const saved = localStorage.getItem('bosdm_dynamic_charts');
-        if (saved) setAllCharts(JSON.parse(saved));
-    }, [isAdmin, navigate]);
+        const fetchCharts = async () => {
+            try {
+                const res = await fetch('/api/grafik/get.php');
+                const result = await res.json();
+                if (result.status === 'success') setAllCharts(result.data);
+                else setApiError('Gagal memuat data grafik');
+            } catch {
+                setApiError('Koneksi server gagal');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCharts();
+    }, []);
 
-    const save = (updated) => {
-        setAllCharts(updated);
-        localStorage.setItem('bosdm_dynamic_charts', JSON.stringify(updated));
+    // Helper: simpan chart ke API
+    const saveChartToApi = async (chartData) => {
+        try {
+            const res = await fetch('/api/grafik/save.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(chartData),
+            });
+            return await res.json();
+        } catch { return { status: 'error', message: 'Koneksi gagal' }; }
     };
 
     const resetAdd = () => { setIsAddOpen(false); setDraft({ title: '', type: 'bar', palette: 'ocean', data: [] }); };
 
-    /* ── toggle publish ────────────────────────────────── */
-    const togglePublish = (id) => save(allCharts.map(c => c.id === id ? { ...c, published: !c.published } : c));
+    // Toggle publish via API
+    const togglePublish = async (id) => {
+        const res = await fetch('/api/grafik/toggle_publish.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            setAllCharts(prev => prev.map(c => c.id === id ? { ...c, published: !!result.published } : c));
+        }
+    };
 
-    /* ── card-level import ─────────────────────────────── */
-    const cardImport = (chartId, e) => {
+    const cardImport = async (chartId, e) => {
         const file = e.target.files[0]; e.target.value = '';
         if (!file) return;
         const setStatus = (msg) => {
             setCardStatus(p => ({ ...p, [chartId]: msg }));
             setTimeout(() => setCardStatus(p => { const n = { ...p }; delete n[chartId]; return n; }), 4000);
         };
+        const chart = allCharts.find(c => c.id === chartId);
         parseExcel(
             file,
-            rows => { save(allCharts.map(c => c.id === chartId ? { ...c, data: rows, updatedAt: new Date().toISOString() } : c)); setStatus(`success:${rows.length} baris diperbarui`); },
+            async rows => {
+                const updated = { ...chart, data: rows };
+                const result = await saveChartToApi(updated);
+                if (result.status === 'success') {
+                    setAllCharts(prev => prev.map(c => c.id === chartId ? updated : c));
+                    setStatus(`success:${rows.length} baris diperbarui`);
+                } else { setStatus('error:Gagal menyimpan ke server'); }
+            },
             msg => setStatus(`error:${msg}`)
         );
     };
 
-    /* ── add submit ────────────────────────────────────── */
-    const submitAdd = () => {
+    const submitAdd = async () => {
         if (!draft.title.trim() || !draft.data.length) return alert('Lengkapi judul dan data!');
-        save([...allCharts, { ...draft, id: Date.now(), published: false, createdAt: new Date().toISOString() }]);
-        resetAdd();
+        const newChart = { ...draft, id: Date.now(), published: false, createdAt: new Date().toISOString() };
+        const result = await saveChartToApi(newChart);
+        if (result.status === 'success') { setAllCharts(prev => [newChart, ...prev]); resetAdd(); }
+        else alert('Gagal menyimpan grafik: ' + result.message);
     };
 
-    /* ── edit save ─────────────────────────────────────── */
-    const submitEdit = () => {
-        save(allCharts.map(c => c.id === editModal.id ? editModal : c));
+    const submitEdit = async () => {
+        const result = await saveChartToApi(editModal);
+        if (result.status === 'success') { setAllCharts(prev => prev.map(c => c.id === editModal.id ? editModal : c)); }
         setEditModal(null);
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] font-sans">
-            {/* NAVBAR */}
-            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans text-left">
+            <nav className="border-b border-slate-200 px-6 py-4 sticky top-0 z-50 bg-white/90 backdrop-blur-md text-left">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate(-1)}>
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
                         <img src={logoBrin} alt="Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                     </div>
                     <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
@@ -297,60 +331,56 @@ export default function GrafikData({ userRole }) {
             </nav>
 
             <div className="max-w-7xl mx-auto p-6 lg:p-10">
-                {/* Page header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
                     <div>
-                        <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Pengelola Visualisasi</h1>
-                        <p className="text-slate-400 text-sm mt-1">{allCharts.length} grafik · {allCharts.filter(c => c.published).length} live</p>
+                        <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Grafik Kepegawaian</h1>
+                        <p className="text-slate-400 text-sm mt-1">{allCharts.length} grafik tersedia</p>
                     </div>
-                    <button onClick={() => setIsAddOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 shadow-xl shadow-blue-100 transition-all active:scale-95 uppercase tracking-wider text-xs">
-                        <Plus size={18} /> Tambah Grafik Baru
-                    </button>
+
+                    {/* Tombol Tambah: hanya jika canEdit */}
+                    {canEdit && (
+                        <button onClick={() => setIsAddOpen(true)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 shadow-xl shadow-blue-100 transition-all active:scale-95 uppercase tracking-wider text-xs">
+                            <Plus size={18} /> Tambah Grafik Baru
+                        </button>
+                    )}
                 </div>
 
-                {/* Empty state */}
                 {allCharts.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-32 text-slate-300">
                         <BarChart2 size={56} strokeWidth={1} className="mb-4" />
-                        <p className="font-black uppercase tracking-widest text-sm">Belum ada grafik — klik "Tambah Grafik Baru"</p>
+                        <p className="font-black uppercase tracking-widest text-sm">Belum ada grafik tersedia</p>
                     </div>
                 )}
 
-                {/* Chart grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {allCharts.map(chart => (
-                        <motion.div key={chart.id} layout
-                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        <motion.div key={chart.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                             className="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col overflow-hidden">
 
-                            {/* Card header */}
-                            <div className="px-6 pt-5 pb-3 flex justify-between items-center">
+                            <div className="px-6 pt-5 pb-3 flex justify-between items-center text-left">
                                 <div className="min-w-0">
                                     <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.25em]">{chart.type} chart</p>
                                     <h3 className="font-black text-sm text-slate-800 truncate max-w-[180px]">{chart.title}</h3>
                                 </div>
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                    {/* Import Excel on card */}
-                                    <label title="Perbarui data via Excel" className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-full transition-colors cursor-pointer">
-                                        <FileSpreadsheet size={14} />
-                                        <input type="file" className="hidden" accept=".xlsx,.xls" onChange={e => cardImport(chart.id, e)} />
-                                    </label>
-                                    <button onClick={() => setEditModal({ ...chart })} className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition-colors">
-                                        <Edit3 size={14} />
-                                    </button>
-                                    <button onClick={() => setDeleteTarget(chart)} className="p-2 text-red-400 hover:bg-red-50 rounded-full transition-colors">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
+
+                                {/* Tombol aksi kartu: granular per permission */}
+                                {(canEdit || canDelete) && (
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        {canEdit && (
+                                        <label title="Perbarui via Excel" className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-full transition-colors cursor-pointer">
+                                            <FileSpreadsheet size={14} />
+                                            <input type="file" className="hidden" accept=".xlsx,.xls" onChange={e => cardImport(chart.id, e)} />
+                                        </label>
+                                        )}
+                                        {canEdit && <button onClick={() => setEditModal({ ...chart })} className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition-colors"><Edit3 size={14} /></button>}
+                                        {canDelete && <button onClick={() => setDeleteTarget(chart)} className="p-2 text-red-400 hover:bg-red-50 rounded-full transition-colors"><Trash2 size={14} /></button>}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Chart */}
-                            <div id={`chart-${chart.id}`} className="px-4 pb-4 bg-white">
-                                <ChartRenderer chart={chart} height={220} />
-                            </div>
+                            <div className="px-4 pb-4 bg-white"><ChartRenderer chart={chart} height={220} /></div>
 
-                            {/* Import status toast */}
                             {cardStatus[chart.id] && (() => {
                                 const [type, msg] = cardStatus[chart.id].split(':');
                                 const ok = type === 'success';
@@ -362,31 +392,18 @@ export default function GrafikData({ userRole }) {
                                 );
                             })()}
 
-                            {/* Footer */}
                             <div className="px-5 py-3 bg-slate-50/60 border-t border-slate-50 flex justify-between items-center mt-auto">
-                                <div className="flex items-center gap-2">
-                                    {/* Palette swatches */}
-                                    <div className="flex gap-1">
-                                        {(PALETTES[chart.palette] || []).slice(0, 5).map((c, i) => (
-                                            <span key={i} className="w-3 h-3 rounded-full border border-white shadow-sm" style={{ background: c }} />
-                                        ))}
-                                    </div>
-                                    {chart.updatedAt && (
-                                        <span className="text-[9px] text-slate-300 font-medium">
-                                            {new Date(chart.updatedAt).toLocaleDateString('id-ID')}
-                                        </span>
-                                    )}
+                                <div className="flex gap-1">
+                                    {(PALETTES[chart.palette] || []).slice(0, 5).map((c, i) => (
+                                        <span key={i} className="w-3 h-3 rounded-full border border-white shadow-sm" style={{ background: c }} />
+                                    ))}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {/* Publish toggle */}
-                                    <PublishToggle published={chart.published} onClick={() => togglePublish(chart.id)} />
-                                    {/* Download as Excel */}
-                                    <button
-                                        onClick={() => downloadChartAsExcel(chart)}
-                                        title="Unduh data sebagai Excel"
-                                        className="text-slate-400 hover:text-blue-600 transition-colors p-1.5 rounded-full hover:bg-blue-50">
-                                        <Download size={14} />
-                                    </button>
+                                    {/* Publish toggle: hanya jika canPublish */}
+                                    {canPublish && (
+                                        <PublishToggle published={chart.published} onClick={() => togglePublish(chart.id)} />
+                                    )}
+                                    <button onClick={() => downloadChartAsExcel(chart)} className="text-slate-400 hover:text-blue-600 p-1.5 rounded-full hover:bg-blue-50 transition-colors"><Download size={14} /></button>
                                 </div>
                             </div>
                         </motion.div>
@@ -394,98 +411,43 @@ export default function GrafikData({ userRole }) {
                 </div>
             </div>
 
-            {/* ══ ADD MODAL ══════════════════════════════════════ */}
+            {/* MODAL CONFIGURATOR (Hanya jika canEdit) */}
             <AnimatePresence>
-                {isAddOpen && (
+                {canEdit && isAddOpen && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-                            className="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[94vh] flex flex-col">
-
-                            {/* Modal header */}
+                        <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }} className="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[94vh] flex flex-col text-left">
                             <div className="flex justify-between items-center px-8 pt-8 pb-5 border-b border-slate-100 shrink-0">
                                 <div>
                                     <h2 className="text-2xl font-black text-slate-900 italic uppercase tracking-tighter">Visual Configurator</h2>
                                     <p className="text-xs text-slate-400 font-medium mt-0.5">Buat & preview grafik sebelum dipublikasi</p>
                                 </div>
-                                <button onClick={resetAdd} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                                    <X className="w-5 h-5 text-slate-500" />
-                                </button>
+                                <button onClick={resetAdd} className="p-2 hover:bg-slate-100 rounded-full"><X className="w-5 h-5 text-slate-500" /></button>
                             </div>
-
                             <div className="grid lg:grid-cols-2 gap-0 overflow-hidden flex-1">
-                                {/* Left: Settings */}
                                 <div className="overflow-y-auto p-8 space-y-6 border-r border-slate-100">
-                                    {/* Title */}
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-slate-400 mb-1.5 block">Judul Grafik</label>
-                                        <input type="text"
-                                            className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm transition-all text-slate-800 placeholder-slate-300"
-                                            placeholder="Contoh: Rekap Status Pegawai"
-                                            value={draft.title}
-                                            onChange={e => setDraft(p => ({ ...p, title: e.target.value }))} />
+                                        <input type="text" className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm" placeholder="Contoh: Rekap Status Pegawai" value={draft.title} onChange={e => setDraft(p => ({ ...p, title: e.target.value }))} />
                                     </div>
-
-                                    {/* Excel upload */}
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Impor Data Excel</label>
-                                        <ExcelUploadZone onData={rows => setDraft(p => ({ ...p, data: rows }))} rowCount={draft.data.length} />
-                                    </div>
-
-                                    {/* Chart type */}
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Tipe Grafik</label>
-                                        <ChartTypePicker value={draft.type} onChange={v => setDraft(p => ({ ...p, type: v }))} />
-                                    </div>
-
-                                    {/* Palette */}
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Palet Warna</label>
-                                        <PalettePicker value={draft.palette} onChange={v => setDraft(p => ({ ...p, palette: v }))} />
-                                    </div>
-
-                                    {/* Publish */}
-                                    <button type="button" onClick={submitAdd}
-                                        className="w-full py-4 bg-blue-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:-translate-y-0.5 transition-all text-sm">
-                                        Publish Ke Beranda
-                                    </button>
+                                    <ExcelUploadZone onData={rows => setDraft(p => ({ ...p, data: rows }))} rowCount={draft.data.length} />
+                                    <ChartTypePicker value={draft.type} onChange={v => setDraft(p => ({ ...p, type: v }))} />
+                                    <PalettePicker value={draft.palette} onChange={v => setDraft(p => ({ ...p, palette: v }))} />
+                                    <button onClick={submitAdd} className="w-full py-4 bg-blue-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:-translate-y-0.5 transition-all text-sm">Publish Ke Beranda</button>
                                 </div>
-
-                                {/* Right: Live Preview — white/clean */}
-                                <div className="bg-slate-50 p-8 flex flex-col overflow-hidden">
-                                    <div className="flex items-center gap-3 mb-5 shrink-0">
-                                        <div className="flex gap-1.5">
-                                            <div className="w-3 h-3 bg-red-400 rounded-full" />
-                                            <div className="w-3 h-3 bg-amber-400 rounded-full" />
-                                            <div className="w-3 h-3 bg-green-400 rounded-full" />
-                                        </div>
-                                        <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Live Preview</span>
-                                    </div>
-                                    <div className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col items-center justify-center min-h-[280px]">
+                                <div className="bg-slate-50 p-8 flex flex-col justify-center items-center overflow-hidden">
+                                    <div className="w-full bg-white p-6 rounded-3xl shadow-sm min-h-[350px] flex flex-col justify-center items-center">
                                         {draft.data.length > 0 ? (
                                             <>
-                                                {draft.title && (
-                                                    <p className="text-xs font-black text-slate-700 uppercase tracking-widest mb-4 text-center">{draft.title}</p>
-                                                )}
-                                                <div className="w-full">
-                                                    <ChartRenderer chart={draft} height={260} />
-                                                </div>
+                                                <p className="text-xs font-black text-slate-700 uppercase tracking-widest mb-4">{draft.title || 'Preview Grafik'}</p>
+                                                <ChartRenderer chart={draft} height={260} />
                                             </>
                                         ) : (
                                             <div className="text-slate-300 text-center">
                                                 <FileSpreadsheet className="mx-auto mb-3 opacity-30" size={48} />
-                                                <p className="text-xs uppercase font-bold tracking-widest opacity-50">Import data untuk preview</p>
+                                                <p className="text-xs uppercase font-bold tracking-widest opacity-50 text-center">Import data untuk preview</p>
                                             </div>
                                         )}
                                     </div>
-                                    {/* Palette preview strip */}
-                                    {draft.palette && (
-                                        <div className="flex gap-2 mt-4 justify-center shrink-0">
-                                            {(PALETTES[draft.palette] || []).map((c, i) => (
-                                                <span key={i} className="w-5 h-5 rounded-full shadow-sm border-2 border-white" style={{ background: c }} />
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </motion.div>
@@ -493,108 +455,72 @@ export default function GrafikData({ userRole }) {
                 )}
             </AnimatePresence>
 
-            {/* ══ EDIT MODAL ═════════════════════════════════════ */}
+            {/* MODAL EDIT (Lengkap dengan tabel baris) */}
             <AnimatePresence>
                 {editModal && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.94, opacity: 0 }}
-                            className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-
-                            <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b border-slate-100 shrink-0">
-                                <h3 className="text-xl font-black text-slate-900 italic uppercase">Edit Grafik</h3>
-                                <button onClick={() => setEditModal(null)} className="p-2 hover:bg-slate-50 rounded-full">
-                                    <X className="w-4 h-4 text-slate-500" />
-                                </button>
+                        <motion.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.94, opacity: 0 }} className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-left">
+                            <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b shrink-0">
+                                <h3 className="text-xl font-black text-slate-900 italic uppercase">Edit Grafik & Data</h3>
+                                <button onClick={() => setEditModal(null)} className="p-2 hover:bg-slate-50 rounded-full"><X className="w-4 h-4 text-slate-500" /></button>
                             </div>
-
-                            <div className="overflow-y-auto flex-1 p-8 space-y-6">
-                                {/* Title */}
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 mb-1.5 block">Judul</label>
-                                    <input type="text"
-                                        className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm text-slate-800"
-                                        value={editModal.title}
-                                        onChange={e => setEditModal(p => ({ ...p, title: e.target.value }))} />
-                                </div>
-
-                                {/* Chart type */}
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Tipe Grafik</label>
+                            <div className="overflow-y-auto flex-1 p-8 grid md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-slate-400 block mb-1.5">Judul</label>
+                                        <input type="text" className="w-full bg-slate-50 border px-4 py-3 rounded-2xl font-bold" value={editModal.title} onChange={e => setEditModal(p => ({ ...p, title: e.target.value }))} />
+                                    </div>
                                     <ChartTypePicker value={editModal.type} onChange={v => setEditModal(p => ({ ...p, type: v }))} />
-                                </div>
-
-                                {/* Palette */}
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Palet Warna</label>
                                     <PalettePicker value={editModal.palette} onChange={v => setEditModal(p => ({ ...p, palette: v }))} />
                                 </div>
-
-                                {/* Mini live preview */}
-                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Preview</p>
-                                    <ChartRenderer chart={editModal} height={180} />
-                                </div>
-
-                                {/* Data table */}
-                                <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 mb-2 block">Data Baris</label>
-                                    <div className="max-h-[280px] overflow-y-auto pr-1 rounded-2xl border border-slate-100 overflow-hidden">
-                                        <table className="w-full text-left text-sm">
-                                            <thead className="bg-slate-50 font-bold text-slate-400 text-[10px] uppercase tracking-widest sticky top-0">
-                                                <tr><th className="p-4">Label</th><th className="p-4">Nilai</th><th className="p-4 w-10" /></tr>
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 block">Edit Baris Data</label>
+                                    <div className="border rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
+                                        <table className="w-full text-xs text-left">
+                                            <thead className="bg-slate-50 font-bold uppercase text-slate-400 text-[9px] sticky top-0">
+                                                <tr><th className="p-3">Label</th><th className="p-3">Nilai</th><th className="p-3" /></tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-50">
+                                            <tbody className="divide-y">
                                                 {editModal.data.map((row, idx) => (
                                                     <tr key={idx}>
-                                                        <td className="p-2">
-                                                            <input className="w-full p-3 bg-slate-50 rounded-xl font-bold text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-400"
-                                                                value={row.name}
-                                                                onChange={e => { const d = [...editModal.data]; d[idx] = { ...d[idx], name: e.target.value }; setEditModal(p => ({ ...p, data: d })); }} />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <input type="number" className="w-full p-3 bg-slate-50 rounded-xl font-black text-blue-600 text-sm outline-none focus:ring-2 focus:ring-blue-400"
-                                                                value={row.value}
-                                                                onChange={e => { const d = [...editModal.data]; d[idx] = { ...d[idx], value: parseFloat(e.target.value) || 0 }; setEditModal(p => ({ ...p, data: d })); }} />
-                                                        </td>
-                                                        <td className="p-2 text-center">
-                                                            <button onClick={() => setEditModal(p => ({ ...p, data: p.data.filter((_, i) => i !== idx) }))}
-                                                                className="text-slate-300 hover:text-red-500 transition-colors">
-                                                                <XCircle size={18} />
-                                                            </button>
-                                                        </td>
+                                                        <td className="p-2"><input className="w-full p-2 bg-slate-50 rounded-lg outline-none" value={row.name} onChange={e => { const d = [...editModal.data]; d[idx].name = e.target.value; setEditModal({ ...editModal, data: d }); }} /></td>
+                                                        <td className="p-2"><input type="number" className="w-full p-2 bg-slate-50 rounded-lg outline-none font-black text-blue-600" value={row.value} onChange={e => { const d = [...editModal.data]; d[idx].value = parseFloat(e.target.value) || 0; setEditModal({ ...editModal, data: d }); }} /></td>
+                                                        <td className="p-2"><button onClick={() => setEditModal({ ...editModal, data: editModal.data.filter((_, i) => i !== idx) })} className="text-red-400"><XCircle size={16} /></button></td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
-
-                                    <button onClick={() => setEditModal(p => ({ ...p, data: [...p.data, { name: 'Data Baru', value: 0 }] }))}
-                                        className="mt-3 w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase hover:text-blue-600 hover:border-blue-400 transition-all">
-                                        + Tambah Baris
-                                    </button>
+                                    <button onClick={() => setEditModal({ ...editModal, data: [...editModal.data, { name: 'Baru', value: 0 }] })} className="w-full py-2 border-2 border-dashed rounded-xl text-[10px] font-black text-slate-400 uppercase">+ Tambah Baris</button>
                                 </div>
                             </div>
-
-                            <div className="flex gap-4 px-8 py-5 border-t border-slate-100 shrink-0">
-                                <button onClick={() => setEditModal(null)} className="flex-1 py-3.5 font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition-colors text-sm">Batal</button>
-                                <button onClick={submitEdit}
-                                    className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">
-                                    <Save size={14} /> Simpan Perubahan
-                                </button>
+                            <div className="p-6 border-t flex gap-4">
+                                <button onClick={() => setEditModal(null)} className="flex-1 py-3 font-bold text-slate-400">Batal</button>
+                                <button onClick={submitEdit} className="flex-1 py-3 bg-slate-900 text-white rounded-2xl font-black">Simpan</button>
                             </div>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
 
-            {/* ══ DELETE MODAL ═══════════════════════════════════ */}
+            {/* MODAL DELETE */}
             <AnimatePresence>
                 {deleteTarget && (
                     <DeleteModal
                         chart={deleteTarget}
                         onCancel={() => setDeleteTarget(null)}
-                        onConfirm={() => { save(allCharts.filter(c => c.id !== deleteTarget.id)); setDeleteTarget(null); }}
+                        onConfirm={async () => {
+                            const res = await fetch('/api/grafik/delete.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: deleteTarget.id }),
+                            });
+                            const result = await res.json();
+                            if (result.status === 'success') {
+                                setAllCharts(prev => prev.filter(c => c.id !== deleteTarget.id));
+                            } else { alert('Gagal menghapus: ' + result.message); }
+                            setDeleteTarget(null);
+                        }}
                     />
                 )}
             </AnimatePresence>

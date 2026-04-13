@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Components
@@ -14,30 +14,95 @@ import BeritaKami from './pages/BeritaKami';
 import EditorBerita from './pages/EditorBerita';
 import DokumenKami from './pages/DokumenKami';
 import GrafikData from './pages/GrafikData';
+import AdminLaporAction from './pages/AdminLaporAction';
+import KelolaUser from './pages/KelolaUser';
 
+// Fitur Baru Modal
+import EditProfil from './pages/EditProfil';
+import InboxLayanan from './pages/InboxLayanan';
 
-
+// RBAC
+import { buildPermissions } from './lib/permissions';
 
 function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  // Persistence: Cek status login dari memori browser
+  // --- STATE MODAL GLOBAL ---
+  const [isEditProfilOpen, setIsEditProfilOpen] = useState(false);
+  const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
+  // Inisialisasi state dari localStorage
+  const [userData, setUserData] = useState(() => {
+    const saved = localStorage.getItem('user_data');
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
   });
-  const [userRole, setUserRole] = useState(() => {
-    return localStorage.getItem('userRole') || 'pegawai';
-  });
 
+  // Sinkronisasi state ke localStorage setiap ada perubahan
   useEffect(() => {
     localStorage.setItem('isLoggedIn', isLoggedIn);
-    localStorage.setItem('userRole', userRole);
-  }, [isLoggedIn, userRole]);
+    if (userData) {
+      localStorage.setItem('user_data', JSON.stringify(userData));
+    } else {
+      localStorage.removeItem('user_data');
+    }
+  }, [isLoggedIn, userData]);
 
-  const handleLoginSuccess = (userData) => {
-    const role = userData.is_superadmin ? 'superadmin' : 'pegawai';
-    setUserRole(role);
+  // --- TAMBAHAN: LOGIKA REFRESH DATA USER DARI DATABASE ---
+  // Agar ketika user refresh halaman, data NIP/Biro/Unit terbaru langsung ditarik dari SQL
+  useEffect(() => {
+    if (isLoggedIn && userData?.id) {
+      const refreshUser = async () => {
+        try {
+          const res = await fetch(`/api/get_user_info.php?user_id=${userData.id}`);
+          const result = await res.json();
+          if (result.status === 'success') {
+            setUserData(result.data);
+          }
+        } catch (e) {
+          console.error("Gagal refresh data profil");
+        }
+      };
+      refreshUser();
+    }
+  }, [isLoggedIn]);
+
+  // --- LOGIKA POLLING NOTIFIKASI (Sesuai get_notifikasi.php kamu) ---
+  useEffect(() => {
+    if (isLoggedIn && userData) {
+      const fetchNotif = async () => {
+        try {
+          const res = await fetch(`/api/get_notifikasi.php?user_id=${userData.id}`);
+          const result = await res.json();
+          // Mengikuti struktur PHP: { status: "success", data: [...] }
+          if (result.status === "success") {
+            setNotifications(result.data);
+          }
+        } catch (e) {
+          console.error("Gagal sinkron inbox:", e);
+        }
+      };
+
+      fetchNotif(); // Ambil saat pertama kali login
+      const interval = setInterval(fetchNotif, 30000); // Polling setiap 30 detik
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn, userData]);
+
+  // Build permissions dari userData (memoized agar tidak re-render setiap saat)
+  const userPermissions = useMemo(() => buildPermissions(userData), [userData]);
+
+  const handleLoginSuccess = (data) => {
+    setUserData(data);
     setIsLoggedIn(true);
     setIsLoginOpen(false);
   };
@@ -45,15 +110,15 @@ function App() {
   const handleLogout = () => {
     if (window.confirm("Keluar dari aplikasi?")) {
       setIsLoggedIn(false);
-      setUserRole('pegawai');
-      localStorage.clear();
+      setUserData(null);
+      localStorage.clear(); // Hapus semua jejak login
     }
   };
 
   return (
     <Router>
       <Routes>
-        {/* HALAMAN UTAMA (LANDING) */}
+        {/* HALAMAN UTAMA / LANDING */}
         <Route
           path="/"
           element={
@@ -68,69 +133,54 @@ function App() {
           }
         />
 
-        {/* DASHBOARD INTERNAL */}
+        {/* DASHBOARD - Ditambahkan props untuk modal & notif */}
         <Route
           path="/dashboard"
           element={
             isLoggedIn ? (
-              <Dashboard userRole={userRole} onLogout={handleLogout} />
+              <Dashboard
+                user={userData}
+                onLogout={handleLogout}
+                onOpenEditProfil={() => setIsEditProfilOpen(true)}
+                onOpenInbox={() => setIsInboxOpen(true)}
+                notifCount={notifications.filter(n => n.is_read === 0).length}
+              />
             ) : (
               <Navigate to="/" replace />
             )
           }
         />
 
-        {/* AKSES PUBLIK (BISA DIBUKA TANPA LOGIN) */}
+        {/* BERITA */}
         <Route path="/berita/:id" element={<NewsDetail />} />
-        <Route path="/berita-kami" element={<BeritaKami userRole={isLoggedIn ? userRole : 'pegawai'} />} />
+        <Route path="/berita-kami" element={isLoggedIn ? <BeritaKami permissions={userPermissions} /> : <Navigate to="/" replace />} />
 
-        {/* RUTE TERPROTEKSI (HARUS LOGIN) */}
-        <Route
-          path="/profil"
-          element={isLoggedIn ? <ProfilBiro userRole={userRole} /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/tanya"
-          element={isLoggedIn ? <TanyaKami userRole={userRole} /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/semua-link"
-          element={isLoggedIn ? <SemuaLink userRole={userRole} /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/dokumen-kami"
-          element={isLoggedIn ? <DokumenKami userRole={userRole} /> : <Navigate to="/" replace />}
-        />
-        <Route
-          path="/grafik-data"
-          element={isLoggedIn ? <GrafikData userRole={userRole} /> : <Navigate to="/" replace />}
-        />
-        {/* RUTE EDITOR (KHUSUS ADMIN/SUPERADMIN) */}
+        {/* PROTECTED ROUTES (Harus Login) */}
+        <Route path="/profil" element={isLoggedIn ? <ProfilBiro permissions={userPermissions} /> : <Navigate to="/" replace />} />
+        <Route path="/tanya" element={isLoggedIn ? <TanyaKami user={userData} permissions={userPermissions} /> : <Navigate to="/" replace />} />
+        <Route path="/semua-link" element={isLoggedIn ? <SemuaLink permissions={userPermissions} /> : <Navigate to="/" replace />} />
+        <Route path="/dokumen-kami" element={isLoggedIn ? <DokumenKami permissions={userPermissions} /> : <Navigate to="/" replace />} />
+        <Route path="/grafik-data" element={isLoggedIn ? <GrafikData permissions={userPermissions} /> : <Navigate to="/" replace />} />
+
+        {/* KHUSUS ADMIN / PERMISSION */}
         <Route
           path="/berita-kami/editor"
-          element={
-            isLoggedIn && (userRole === 'admin' || userRole === 'superadmin') ? (
-              <EditorBerita userRole={userRole} />
-            ) : (
-              <Navigate to="/berita-kami" replace />
-            )
-          }
+          element={isLoggedIn && userPermissions.berita?.edit ? <EditorBerita permissions={userPermissions} /> : <Navigate to="/berita-kami" replace />}
         />
         <Route
-          path="/berita-kami/editor/:id"
-          element={
-            isLoggedIn && (userRole === 'admin' || userRole === 'superadmin') ? (
-              <EditorBerita userRole={userRole} />
-            ) : (
-              <Navigate to="/berita-kami" replace />
-            )
-          }
+          path="/admin-lapor"
+          element={isLoggedIn && userPermissions.lapor?.view ? <AdminLaporAction permissions={userPermissions} /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/kelola-user"
+          element={isLoggedIn && userData?.is_superadmin ? <KelolaUser user={userData} /> : <Navigate to="/" replace />}
         />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
+      {/* MODALS AUTH */}
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
@@ -141,6 +191,23 @@ function App() {
         onClose={() => setIsRegisterOpen(false)}
         onSwitchToLogin={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }}
       />
+
+      {/* MODAL EDIT PROFIL (GLOBAL) */}
+      {isEditProfilOpen && (
+        <EditProfil
+          user={userData}
+          onUpdate={(updated) => setUserData(updated)}
+          onClose={() => setIsEditProfilOpen(false)}
+        />
+      )}
+
+      {/* MODAL INBOX LAYANAN (GLOBAL) */}
+      {isInboxOpen && (
+        <InboxLayanan
+          notifications={notifications}
+          onClose={() => setIsInboxOpen(false)}
+        />
+      )}
     </Router>
   );
 }

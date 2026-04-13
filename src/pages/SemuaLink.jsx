@@ -428,10 +428,12 @@ function UserLinkList({ links, search, setSearch, filterDate, setFilterDate }) {
 }
 
 /* ── MAIN COMPONENT ──────────────────────────────── */
-export default function SemuaLink({ userRole }) {
+export default function SemuaLink({ permissions }) {
     const navigate = useNavigate();
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
-    const isSuperAdmin = userRole === 'superadmin';
+    const canEdit        = !!(permissions?.semua_link?.edit);
+    const canDelete      = !!(permissions?.semua_link?.delete);
+    const isSuperAdmin   = !!(permissions?.semua_link?.manage_fungsi);
+    const isAdmin        = canEdit || canDelete || isSuperAdmin;
     const userFungsi = 'JF1';
 
     const [links, setLinks] = useState(loadLinks);

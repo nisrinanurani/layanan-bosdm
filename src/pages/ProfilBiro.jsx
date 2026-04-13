@@ -156,9 +156,9 @@ const TusiItem = ({ value, onSave, onDelete }) => {
 // ===========================
 // KOMPONEN UTAMA
 // ===========================
-export default function ProfilBiro({ userRole }) {
+export default function ProfilBiro({ permissions }) {
     const navigate = useNavigate();
-    const isSuperadmin = userRole === 'superadmin';
+    const isSuperadmin = !!(permissions?.profil?.edit);
     const [data, setData] = useState(loadData());
 
     useEffect(() => { saveData(data); }, [data]);

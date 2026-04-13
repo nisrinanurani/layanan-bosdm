@@ -187,11 +187,10 @@ function CategoryManager({ categories, setCategories, docs, saveDocs: saveDocsEx
                                 <input autoFocus value={captchaInput} onChange={e => setCaptchaInput(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && captchaMatches && confirmDelete()}
                                     placeholder={`Ketik "${deleteTarget}"`}
-                                    className={`w-full px-3 py-2.5 text-sm font-bold border-2 rounded-xl outline-none transition-all ${
-                                        captchaInput.length === 0 ? 'border-slate-200 bg-slate-50'
-                                        : captchaMatches ? 'border-green-400 bg-green-50 text-green-700'
-                                        : 'border-red-300 bg-red-50 text-red-600'
-                                    }`} />
+                                    className={`w-full px-3 py-2.5 text-sm font-bold border-2 rounded-xl outline-none transition-all ${captchaInput.length === 0 ? 'border-slate-200 bg-slate-50'
+                                            : captchaMatches ? 'border-green-400 bg-green-50 text-green-700'
+                                                : 'border-red-300 bg-red-50 text-red-600'
+                                        }`} />
                                 <AnimatePresence>
                                     {captchaMatches && (
                                         <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -287,10 +286,12 @@ function AddDocModal({ categories, onClose, onSave, isSuperAdmin, cats, setCats,
 }
 
 /* ── MAIN COMPONENT ──────────────────────────────── */
-export default function DokumenKami({ userRole }) {
+export default function DokumenKami({ permissions }) {
     const navigate = useNavigate();
-    const isAdmin = ['admin', 'superadmin'].includes(userRole);
-    const isSuperAdmin = userRole === 'superadmin';
+    const canEdit      = !!(permissions?.dokumen?.edit);
+    const canDelete    = !!(permissions?.dokumen?.delete);
+    const isSuperAdmin = !!(permissions?.dokumen?.manage_kategori);
+    const isAdmin      = canEdit || canDelete || isSuperAdmin;
 
     const [docs, setDocs] = useState(loadDocs);
     const [categories, setCategories] = useState(loadCats);
@@ -347,7 +348,7 @@ export default function DokumenKami({ userRole }) {
                             <h1 className="text-3xl font-black text-slate-900 uppercase">Dokumen Kami</h1>
                             <p className="text-slate-500 text-sm mt-1">Akses berkas dan panduan resmi BOSDM.</p>
                         </div>
-                        {isAdmin && (
+                        {canEdit && (
                             <button onClick={() => setShowModal(true)}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all active:scale-95 text-sm shrink-0">
                                 <Plus className="w-4 h-4" /> Tambah Data
@@ -389,14 +390,14 @@ export default function DokumenKami({ userRole }) {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-100">
-                                        {['No', 'Judul', 'Kategori', 'Deskripsi', 'Waktu', ...(isAdmin ? ['Aksi'] : [])].map(h => (
+                                        {['No', 'Judul', 'Kategori', 'Deskripsi', 'Waktu', ...((canEdit || canDelete) ? ['Aksi'] : [])].map(h => (
                                             <th key={h} className="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
                                     {filteredDocs.length === 0 && (
-                                        <tr><td colSpan={isAdmin ? 6 : 5} className="py-16 text-center text-slate-400">
+                                        <tr><td colSpan={(canEdit || canDelete) ? 6 : 5} className="py-16 text-center text-slate-400">
                                             <FileText className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                             <p className="text-sm font-bold">Belum ada dokumen.</p>
                                         </td></tr>
@@ -421,7 +422,7 @@ export default function DokumenKami({ userRole }) {
                                                 <span className="line-clamp-2">{doc.deskripsi || <span className="italic text-slate-300">—</span>}</span>
                                             </td>
                                             <td className="px-3 py-2.5 text-[10px] text-slate-400 whitespace-nowrap">{formatDate(doc.createdAt)}</td>
-                                            {isAdmin && (
+                                            {canDelete && (
                                                 <td className="px-3 py-2.5">
                                                     <button onClick={() => handleDelete(doc.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                                         <Trash2 className="w-3.5 h-3.5" />

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Plus, Search, Calendar, ChevronDown, X,
@@ -10,9 +10,11 @@ import {
 // Pastikan path logo sesuai dengan folder project kamu
 import logoBrin from '../assets/logo-brin-decs.png';
 
-export default function BeritaKami({ userRole }) {
+export default function BeritaKami({ permissions }) {
     const navigate = useNavigate();
-    const isAdmin = ['superadmin', 'admin'].includes(userRole);
+    const canEdit   = !!(permissions?.berita?.edit);
+    const canDelete = !!(permissions?.berita?.delete);
+    const isAdmin   = canEdit || canDelete;
 
     // --- STATE UTAMA ---
     const [data, setData] = useState([]);
@@ -99,7 +101,7 @@ export default function BeritaKami({ userRole }) {
                         <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Manajemen Berita</h1>
                         <p className="text-slate-500 text-sm mt-1 font-medium">Atur konten publikasi yang tayang di aplikasi BOSDM.</p>
                     </div>
-                    {isAdmin && (
+                    {canEdit && (
                         <button
                             onClick={() => navigate('/berita-kami/editor')}
                             className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95"
@@ -215,13 +217,13 @@ export default function BeritaKami({ userRole }) {
                                         </td>
                                         <td className="p-5">
                                             <div className="flex justify-center gap-3">
-                                                {/* Tombol Toggle Beranda (Star) */}
-                                                {isAdmin && (
+                                                {/* Tombol Toggle Beranda */}
+                                                {canEdit && (
                                                     <button
                                                         onClick={() => toggleHero(item.id)}
                                                         className={`p-2 rounded-xl transition-all border shadow-sm ${item.isHero
-                                                                ? 'bg-yellow-400 border-yellow-500 text-white'
-                                                                : 'bg-white border-slate-100 text-slate-300 hover:text-yellow-500'
+                                                            ? 'bg-yellow-400 border-yellow-500 text-white'
+                                                            : 'bg-white border-slate-100 text-slate-300 hover:text-yellow-500'
                                                             }`}
                                                         title="Tampilkan di Beranda"
                                                     >
@@ -231,10 +233,10 @@ export default function BeritaKami({ userRole }) {
 
                                                 <button onClick={() => navigate(`/berita/${item.id}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-slate-100"><Eye className="w-4 h-4" /></button>
 
-                                                {isAdmin && (
+                                                {(canEdit || canDelete) && (
                                                     <>
-                                                        <button onClick={() => navigate(`/berita-kami/editor/${item.id}`)} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-slate-100"><Edit3 className="w-4 h-4" /></button>
-                                                        <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-slate-100"><Trash2 className="w-4 h-4" /></button>
+                                                        {canEdit && <button onClick={() => navigate(`/berita-kami/editor/${item.id}`)} className="p-2 text-slate-400 hover:text-amber-500 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-slate-100"><Edit3 className="w-4 h-4" /></button>}
+                                                        {canDelete && <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-slate-100"><Trash2 className="w-4 h-4" /></button>}
                                                     </>
                                                 )}
                                             </div>
